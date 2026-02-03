@@ -3,11 +3,33 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
 export default function Login() {
   const navigate = useNavigate();
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
+
+  // Registration dialog state
+  const [registerOpen, setRegisterOpen] = useState(false);
+  const [regUsername, setRegUsername] = useState("");
+  const [regLastName, setRegLastName] = useState("");
+  const [regFirstName, setRegFirstName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState("");
+  const [regErrors, setRegErrors] = useState<Record<string, string>>({});
+
+  // Forgot password dialog state
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +40,61 @@ export default function Login() {
   const handleGoogleLogin = () => {
     // TODO: Implement Google auth
     navigate("/home");
+  };
+
+  const validatePassword = (pwd: string): boolean => {
+    const hasLetter = /[a-zA-Z]/.test(pwd);
+    const hasMinLength = pwd.length >= 10;
+    return hasLetter && hasMinLength;
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+
+    if (!regUsername.trim()) errors.username = "請輸入用戶名";
+    if (!regLastName.trim()) errors.lastName = "請輸入姓";
+    if (!regFirstName.trim()) errors.firstName = "請輸入名";
+    if (!regEmail.trim()) errors.email = "請輸入電子信箱";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(regEmail)) errors.email = "信箱格式不正確";
+    
+    if (!validatePassword(regPassword)) {
+      errors.password = "密碼須至少10個字元且包含英文字母";
+    }
+    if (regPassword !== regConfirmPassword) {
+      errors.confirmPassword = "密碼不一致";
+    }
+
+    setRegErrors(errors);
+
+    if (Object.keys(errors).length === 0) {
+      // TODO: Implement actual registration
+      toast({ title: "註冊成功", description: "請使用新帳號登入" });
+      setRegisterOpen(false);
+      resetRegisterForm();
+    }
+  };
+
+  const resetRegisterForm = () => {
+    setRegUsername("");
+    setRegLastName("");
+    setRegFirstName("");
+    setRegEmail("");
+    setRegPassword("");
+    setRegConfirmPassword("");
+    setRegErrors({});
+  };
+
+  const handleForgotPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail)) {
+      toast({ title: "錯誤", description: "請輸入有效的電子信箱", variant: "destructive" });
+      return;
+    }
+    // TODO: Implement actual password reset
+    toast({ title: "已發送", description: "密碼重設信件已發送至您的信箱" });
+    setForgotOpen(false);
+    setForgotEmail("");
   };
 
   return (
@@ -45,7 +122,21 @@ export default function Login() {
                 登入
               </Button>
               <span className="text-sm text-muted-foreground">
-                註冊 | 忘記密碼
+                <button
+                  type="button"
+                  className="hover:underline"
+                  onClick={() => setRegisterOpen(true)}
+                >
+                  註冊
+                </button>
+                {" | "}
+                <button
+                  type="button"
+                  className="hover:underline"
+                  onClick={() => setForgotOpen(true)}
+                >
+                  忘記密碼
+                </button>
               </span>
             </div>
             <Button
@@ -59,6 +150,96 @@ export default function Login() {
           </form>
         </CardContent>
       </Card>
+
+      {/* Registration Dialog */}
+      <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>註冊</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleRegister} className="space-y-3">
+            <div>
+              <Input
+                placeholder="用戶名 (ID)"
+                value={regUsername}
+                onChange={(e) => setRegUsername(e.target.value)}
+              />
+              {regErrors.username && <p className="text-sm text-destructive mt-1">{regErrors.username}</p>}
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Input
+                  placeholder="姓"
+                  value={regLastName}
+                  onChange={(e) => setRegLastName(e.target.value)}
+                />
+                {regErrors.lastName && <p className="text-sm text-destructive mt-1">{regErrors.lastName}</p>}
+              </div>
+              <div className="flex-1">
+                <Input
+                  placeholder="名"
+                  value={regFirstName}
+                  onChange={(e) => setRegFirstName(e.target.value)}
+                />
+                {regErrors.firstName && <p className="text-sm text-destructive mt-1">{regErrors.firstName}</p>}
+              </div>
+            </div>
+            <div>
+              <Input
+                type="email"
+                placeholder="電子信箱"
+                value={regEmail}
+                onChange={(e) => setRegEmail(e.target.value)}
+              />
+              {regErrors.email && <p className="text-sm text-destructive mt-1">{regErrors.email}</p>}
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="密碼 (至少10字元，含英文)"
+                value={regPassword}
+                onChange={(e) => setRegPassword(e.target.value)}
+              />
+              {regErrors.password && <p className="text-sm text-destructive mt-1">{regErrors.password}</p>}
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="確認密碼"
+                value={regConfirmPassword}
+                onChange={(e) => setRegConfirmPassword(e.target.value)}
+              />
+              {regErrors.confirmPassword && <p className="text-sm text-destructive mt-1">{regErrors.confirmPassword}</p>}
+            </div>
+            <DialogFooter>
+              <Button type="submit">註冊</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>忘記密碼</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              請輸入您的電子信箱，我們將發送密碼重設連結。
+            </p>
+            <Input
+              type="email"
+              placeholder="電子信箱"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+            />
+            <DialogFooter>
+              <Button type="submit">發送驗證信</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
