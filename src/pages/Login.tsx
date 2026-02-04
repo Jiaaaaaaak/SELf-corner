@@ -11,6 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -26,6 +27,11 @@ export default function Login() {
   const [regPassword, setRegPassword] = useState("");
   const [regConfirmPassword, setRegConfirmPassword] = useState("");
   const [regErrors, setRegErrors] = useState<Record<string, string>>({});
+
+  // Password visibility states
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
 
   // Forgot password dialog state
   const [forgotOpen, setForgotOpen] = useState(false);
@@ -111,12 +117,21 @@ export default function Login() {
               value={account}
               onChange={(e) => setAccount(e.target.value)}
             />
-            <Input
-              type="password"
-              placeholder="密碼"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                type={showLoginPassword ? "text" : "password"}
+                placeholder="密碼"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                onClick={() => setShowLoginPassword(!showLoginPassword)}
+              >
+                {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             <div className="flex items-center gap-2">
               <Button type="submit" variant="outline" size="sm">
                 登入
@@ -194,21 +209,39 @@ export default function Login() {
               {regErrors.email && <p className="text-sm text-destructive mt-1">{regErrors.email}</p>}
             </div>
             <div>
-              <Input
-                type="password"
-                placeholder="密碼 (至少10字元，含英文)"
-                value={regPassword}
-                onChange={(e) => setRegPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  type={showRegPassword ? "text" : "password"}
+                  placeholder="密碼 (至少10字元，含英文)"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowRegPassword(!showRegPassword)}
+                >
+                  {showRegPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {regErrors.password && <p className="text-sm text-destructive mt-1">{regErrors.password}</p>}
             </div>
             <div>
-              <Input
-                type="password"
-                placeholder="確認密碼"
-                value={regConfirmPassword}
-                onChange={(e) => setRegConfirmPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  type={showRegConfirmPassword ? "text" : "password"}
+                  placeholder="確認密碼"
+                  value={regConfirmPassword}
+                  onChange={(e) => setRegConfirmPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
+                >
+                  {showRegConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {regErrors.confirmPassword && <p className="text-sm text-destructive mt-1">{regErrors.confirmPassword}</p>}
             </div>
             <DialogFooter>
