@@ -53,9 +53,9 @@ export default function Feedback() {
           <Button
             variant="outline"
             className="mt-4 w-fit"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/teaching")}
           >
-            返回首頁
+            重試一次
           </Button>
         </div>
 
