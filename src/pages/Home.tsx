@@ -4,11 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
 
 export default function Home() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Mock user data
+  const user = {
+    name: "User",
+    avatar: "",
+    usageCount: 8,
+  };
 
   // Mock history data
   const historyItems = [
@@ -21,25 +29,31 @@ export default function Home() {
     (item) => item.topic.toLowerCase().includes(searchQuery.toLowerCase()) || item.date.includes(searchQuery),
   );
 
+  const handleLogout = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
-      <h1 className="text-2xl font-semibold mb-6">Homepage</h1>
+      {/* Header with Avatar, Greeting and Usage Count */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-12 w-12">
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback className="bg-muted text-muted-foreground">
+              {user.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-lg">hi, {user.name}</span>
+        </div>
+        <div className="text-center">
+          <div className="text-sm text-muted-foreground">使用次數</div>
+          <div className="text-2xl font-semibold">{user.usageCount}</div>
+        </div>
+      </div>
 
       <div className="flex gap-6">
-        {/* Left Sidebar - Action Buttons */}
-        <div className="w-48 space-y-3">
-          <Button variant="outline" className="w-full justify-start h-12" onClick={() => navigate("/teaching")}>
-            開始對話
-          </Button>
-          <Button variant="outline" className="w-full justify-start h-12">
-            使用說明
-          </Button>
-          <Button variant="outline" className="w-full justify-start h-12">
-            個人資料
-          </Button>
-        </div>
-
-        {/* Right Content - History */}
+        {/* Left Content - History */}
         <Card className="flex-1">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">History</CardTitle>
@@ -74,6 +88,20 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Right Sidebar - Action Buttons */}
+        <div className="w-32 space-y-3 flex flex-col justify-center">
+          <Button variant="outline" className="w-full justify-center h-12" onClick={() => navigate("/teaching")}>
+            開始對話
+          </Button>
+          <Button variant="outline" className="w-full justify-center h-12">
+            使用說明
+          </Button>
+          <div className="flex-1" />
+          <Button variant="outline" className="w-full justify-center h-12" onClick={handleLogout}>
+            離開
+          </Button>
+        </div>
       </div>
     </div>
   );
