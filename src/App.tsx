@@ -5,7 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import Teaching from "./pages/Teaching";
+import Chatroom from "./pages/Teaching";
+import History from "./pages/History";
+import Info from "./pages/Info";
 import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 
@@ -21,7 +23,9 @@ const App = () => (
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/teaching" element={<Teaching />} />
+          <Route path="/chatroom" element={<Chatroom />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/info" element={<Info />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

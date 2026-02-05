@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function Teaching() {
   const navigate = useNavigate();
@@ -24,7 +25,13 @@ export default function Teaching() {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="flex gap-6 h-[calc(100vh-3rem)]">
+      {/* Header with Hamburger Menu */}
+      <div className="flex items-center gap-4 mb-4">
+        <HamburgerMenu />
+        <h1 className="text-xl font-semibold">對話空間</h1>
+      </div>
+
+      <div className="flex gap-6 h-[calc(100vh-7rem)]">
         {/* Main Content Area - Video/Teaching Placeholder */}
         <div className="flex-1 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
           <span className="text-muted-foreground">

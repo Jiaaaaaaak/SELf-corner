@@ -50,13 +50,20 @@ export default function Feedback() {
               </RadarChart>
             </ResponsiveContainer>
           </div>
-          <Button
-            variant="outline"
-            className="mt-4 w-fit"
-            onClick={() => navigate("/teaching")}
-          >
-            重試一次
-          </Button>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/chatroom")}
+            >
+              重試一次
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/home")}
+            >
+              回首頁
+            </Button>
+          </div>
         </div>
 
         {/* Right Side - Feedback Content */}

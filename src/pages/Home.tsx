@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search } from "lucide-react";
+import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -35,9 +36,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      {/* Header with Avatar, Greeting and Usage Count */}
+      {/* Header with Hamburger Menu, Avatar, Greeting and Usage Count */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
+          <HamburgerMenu />
           <Avatar className="h-12 w-12">
             <AvatarImage src={user.avatar} alt={user.name} />
             <AvatarFallback className="bg-muted text-muted-foreground">
@@ -91,7 +93,7 @@ export default function Home() {
 
         {/* Right Sidebar - Action Buttons */}
         <div className="w-32 space-y-3 flex flex-col justify-center">
-          <Button variant="outline" className="w-full justify-center h-12" onClick={() => navigate("/teaching")}>
+          <Button variant="outline" className="w-full justify-center h-12" onClick={() => navigate("/chatroom")}>
             開始對話
           </Button>
           <Button variant="outline" className="w-full justify-center h-12">
