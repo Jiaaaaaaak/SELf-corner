@@ -48,10 +48,6 @@ export default function Home() {
           </Avatar>
           <span className="text-lg">hi, {user.name}</span>
         </div>
-        <div className="text-center">
-          <div className="text-sm text-muted-foreground">使用次數</div>
-          <div className="text-2xl font-semibold">{user.usageCount}</div>
-        </div>
       </div>
 
       <div className="flex gap-6">
@@ -99,6 +95,10 @@ export default function Home() {
           <Button variant="outline" className="w-full justify-center h-12">
             使用說明
           </Button>
+          <div className="text-center py-2">
+            <div className="text-sm text-muted-foreground">使用次數</div>
+            <div className="text-2xl font-semibold">{user.usageCount}</div>
+          </div>
           <div className="flex-1" />
           <Button variant="outline" className="w-full justify-center h-12" onClick={handleLogout}>
             登出
