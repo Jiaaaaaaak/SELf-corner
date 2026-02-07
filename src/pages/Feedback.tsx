@@ -93,7 +93,7 @@ export default function Feedback() {
     <ScrollArea className="h-screen">
       <div className="min-h-screen bg-background p-6">
         {/* Top Section: Left (Feedback + Radar) | Right (AI Coach Chat) */}
-        <div className="flex gap-6">
+        <div className="flex gap-5">
           {/* Left Side - Expert Feedback & Radar Chart */}
           <div className="w-1/2 flex flex-col">
             <h1 className="text-2xl font-semibold mb-4">專家回饋</h1>
@@ -117,7 +117,7 @@ export default function Feedback() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-3 mt-4">
               <Button variant="outline" onClick={() => navigate("/chatroom")}>
                 重試一次
               </Button>
