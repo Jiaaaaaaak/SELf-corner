@@ -164,9 +164,9 @@ export default function Feedback() {
         </div>
 
         {/* Bottom Section - Chatroom Transcript, no border */}
-        <div className="mt-8 flex">
+        <div className="mt-8 flex flex-col items-center">
           <h2 className="text-xl font-semibold mb-4">教學逐字稿</h2>
-          <div className="space-y-3">
+          <div className="space-y-3 max-w-2xl w-full">
             {defaultTranscript.map((entry, index) => (
               <div key={index}>
                 <span className="text-sm font-medium text-muted-foreground">
