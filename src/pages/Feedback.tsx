@@ -117,7 +117,7 @@ export default function Feedback() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-2 mt-4">
               <Button variant="outline" onClick={() => navigate("/chatroom")}>
                 重試一次
               </Button>
