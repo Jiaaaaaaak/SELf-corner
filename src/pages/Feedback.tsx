@@ -91,7 +91,7 @@ export default function Feedback() {
 
   return (
     <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-background p-6 max-w-5xl mx-auto">
         {/* Top Section: Left (Feedback + Radar) | Right (AI Coach Chat) */}
         <div className="flex gap-6">
           {/* Left Side - Expert Feedback & Radar Chart */}

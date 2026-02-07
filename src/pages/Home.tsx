@@ -35,7 +35,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6 max-w-5xl mx-auto">
       {/* Header with Hamburger Menu, Avatar, Greeting and Usage Count */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
