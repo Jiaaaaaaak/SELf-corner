@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import HamburgerMenu from "@/components/HamburgerMenu";
+import classroomBackground from "@/assets/classroom-background.png";
 
 export default function Teaching() {
   const navigate = useNavigate();
@@ -32,11 +33,18 @@ export default function Teaching() {
       </div>
 
       <div className="flex gap-6 h-[calc(100vh-7rem)]">
-        {/* Main Content Area - Video/Teaching Placeholder */}
-        <div className="flex-1 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
-          <span className="text-muted-foreground">
-            {isStarted ? (isPaused ? "已暫停" : "教學進行中...") : "等待開始"}
-          </span>
+        {/* Main Content Area - Classroom Background */}
+        <div className="flex-1 rounded-lg overflow-hidden relative">
+          <img 
+            src={classroomBackground} 
+            alt="教室背景" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-background/30">
+            <span className="text-foreground font-medium text-lg">
+              {isStarted ? (isPaused ? "已暫停" : "教學進行中...") : "等待開始"}
+            </span>
+          </div>
         </div>
 
         {/* Right Sidebar - Control Buttons */}
