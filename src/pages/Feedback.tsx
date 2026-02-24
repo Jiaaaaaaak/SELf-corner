@@ -192,26 +192,26 @@ export default function Feedback() {
               </div>
             </TabsContent>
 
-            {/* Separate view - teacher & student columns */}
+            {/* Separate view - teacher & student columns aligned row by row */}
             <TabsContent value="separate">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-4">【老師】對話紀錄</h3>
-                  <div className="space-y-3">
-                    {teacherTranscript.map((entry, index) => <div key={index}>
-                        <p className="text-base text-foreground">{entry.content}</p>
-                      </div>)}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-4">【學生】對話紀錄</h3>
-                  <div className="space-y-3">
-                    {studentTranscript.map((entry, index) => <div key={index}>
-                        <p className="text-base text-foreground">{entry.content}</p>
-                      </div>)}
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 gap-6 px-4 pb-2">
+                <h3 className="text-lg font-semibold">【老師】對話紀錄</h3>
+                <h3 className="text-lg font-semibold">【學生】對話紀錄</h3>
               </div>
+              {Array.from({ length: Math.max(teacherTranscript.length, studentTranscript.length) }).map((_, index) => (
+                <div key={index} className="grid grid-cols-2 gap-6">
+                  <div className="px-4 py-3 border-b border-border min-h-[60px] flex items-start">
+                    {teacherTranscript[index] && (
+                      <p className="text-base text-foreground">{teacherTranscript[index].content}</p>
+                    )}
+                  </div>
+                  <div className="px-4 py-3 border-b border-border min-h-[60px] flex items-start">
+                    {studentTranscript[index] && (
+                      <p className="text-base text-foreground">{studentTranscript[index].content}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
             </TabsContent>
           </Tabs>
         </div>
