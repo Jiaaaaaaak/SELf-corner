@@ -112,7 +112,7 @@ export default function Teaching() {
                     onClick={() => handleSelectScenario(scenario.id)}
                     className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 ${
                       selectedScenario === scenario.id && !isRandomMode
-                        ? "border-primary bg-secondary shadow-md ring-2 ring-primary"
+                        ? "border-primary bg-foreground/60 backdrop-blur-md shadow-md ring-2 ring-primary"
                         : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                     }`}
                   >
@@ -132,7 +132,7 @@ export default function Teaching() {
                 onClick={handleRandomScenario}
                 className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed mb-5 max-w-2xl w-full ${
                   isRandomMode
-                    ? "border-primary bg-secondary shadow-md ring-2 ring-primary"
+                    ? "border-primary bg-foreground/60 backdrop-blur-md shadow-md ring-2 ring-primary"
                     : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                 }`}
               >
