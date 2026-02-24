@@ -92,7 +92,7 @@ export default function Teaching() {
           {!isStarted && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/40 backdrop-blur-sm p-8">
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-2xl font-bold text-primary-foreground bg-primary/80 px-4 py-1.5 rounded-lg drop-shadow-md">選擇練習情境</h2>
+                <h2 className="text-2xl font-bold text-background drop-shadow-md">選擇練習情境</h2>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -119,7 +119,7 @@ export default function Teaching() {
                     <CardContent className="p-4 text-center space-y-2">
                       <span className="text-3xl">{scenario.emoji}</span>
                       <p className={`font-medium text-sm leading-tight ${selectedScenario === scenario.id && !isRandomMode ? "text-foreground font-bold" : "text-foreground"}`}>{scenario.title}</p>
-                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full border ${selectedScenario === scenario.id && !isRandomMode ? "bg-primary/20 text-foreground font-semibold border-primary/50" : "bg-muted text-muted-foreground border-transparent"}`}>
+                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full border ${selectedScenario === scenario.id && !isRandomMode ? "bg-primary/20 border-primary/50 text-foreground font-semibold" : "bg-muted border-border text-muted-foreground"}`}>
                         {scenario.tag}
                       </span>
                     </CardContent>
@@ -139,7 +139,7 @@ export default function Teaching() {
                 <CardContent className="p-4 text-center space-y-2 flex flex-col items-center justify-center">
                   <Dices className={`h-7 w-7 ${isRandomMode ? "text-primary" : "text-muted-foreground"}`} />
                   <p className={`font-medium text-sm leading-tight ${isRandomMode ? "text-foreground font-bold" : "text-foreground"}`}>隨機情境</p>
-                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full border ${isRandomMode ? "bg-primary/20 text-foreground font-semibold border-primary/50" : "bg-muted text-muted-foreground border-transparent"}`}>
+                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full border ${isRandomMode ? "bg-primary/20 border-primary/50 text-foreground font-semibold" : "bg-muted border-border text-muted-foreground"}`}>
                     驚喜挑戰
                   </span>
                 </CardContent>
