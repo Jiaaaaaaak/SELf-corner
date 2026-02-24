@@ -112,14 +112,14 @@ export default function Teaching() {
                     onClick={() => handleSelectScenario(scenario.id)}
                     className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 ${
                       selectedScenario === scenario.id && !isRandomMode
-                    ? "border-primary bg-primary/50 shadow-md"
+                        ? "border-primary bg-secondary shadow-md ring-2 ring-primary"
                         : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                     }`}
                   >
                     <CardContent className="p-4 text-center space-y-2">
                       <span className="text-3xl">{scenario.emoji}</span>
-                      <p className={`font-medium text-sm leading-tight ${selectedScenario === scenario.id && !isRandomMode ? "text-primary-foreground font-bold" : "text-foreground"}`}>{scenario.title}</p>
-                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${selectedScenario === scenario.id && !isRandomMode ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                      <p className={`font-medium text-sm leading-tight ${selectedScenario === scenario.id && !isRandomMode ? "text-secondary-foreground font-bold" : "text-foreground"}`}>{scenario.title}</p>
+                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${selectedScenario === scenario.id && !isRandomMode ? "bg-secondary-foreground/20 text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
                         {scenario.tag}
                       </span>
                     </CardContent>
@@ -132,14 +132,14 @@ export default function Teaching() {
                 onClick={handleRandomScenario}
                 className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed mb-5 max-w-2xl w-full ${
                   isRandomMode
-                    ? "border-primary bg-primary/50 shadow-md"
+                    ? "border-primary bg-secondary shadow-md ring-2 ring-primary"
                     : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                 }`}
               >
                 <CardContent className="p-4 text-center space-y-2 flex flex-col items-center justify-center">
-                  <Dices className="h-7 w-7 text-muted-foreground" />
-                  <p className={`font-medium text-sm leading-tight ${isRandomMode ? "text-primary-foreground font-bold" : "text-foreground"}`}>隨機情境</p>
-                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${isRandomMode ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                  <Dices className={`h-7 w-7 ${isRandomMode ? "text-secondary-foreground" : "text-muted-foreground"}`} />
+                  <p className={`font-medium text-sm leading-tight ${isRandomMode ? "text-secondary-foreground font-bold" : "text-foreground"}`}>隨機情境</p>
+                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${isRandomMode ? "bg-secondary-foreground/20 text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
                     驚喜挑戰
                   </span>
                 </CardContent>
