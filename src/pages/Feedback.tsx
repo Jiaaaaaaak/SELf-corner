@@ -94,36 +94,28 @@ export default function Feedback() {
   const handleChatWithExpert = () => {
     console.log("Chat with expert:", userInput);
   };
+  const teacherTranscript = defaultTranscript.filter(e => e.role === "teacher");
+  const studentTranscript = defaultTranscript.filter(e => e.role === "student");
+
   return <ScrollArea className="h-screen">
       <div className="min-h-screen bg-background p-6 max-w-5xl mx-auto">
-        {/* Top Section: Left (Feedback + Radar) | Right (AI Coach Chat) */}
-        <div className="flex gap-6">
-          {/* Left Side - Expert Feedback & Radar Chart */}
-          <div className="w-1/2 flex flex-col">
-            <h1 className="text-2xl font-semibold mb-4">專家回饋</h1>
-
-            {/* Expert Feedback Text with scroll, no border */}
-            <ScrollArea className="h-[280px] mb-4">
-              <p className="text-sm text-foreground whitespace-pre-line leading-relaxed pr-3">
-                {defaultExpertFeedback}
-              </p>
-            </ScrollArea>
-
-            {/* Radar Chart */}
-            <div className="flex items-center justify-center">
+        {/* Top Section: 3 columns - Radar | Feedback | Chat */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Left - Radar Chart */}
+          <div className="flex flex-col border rounded-lg p-4">
+            <h2 className="text-lg font-medium mb-4">效能分析</h2>
+            <div className="flex-1 flex items-center justify-center">
               <ResponsiveContainer width="100%" height={280}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="hsl(var(--border))" />
                   <PolarAngleAxis dataKey="subject" tick={{
-                  fill: "hsl(var(--foreground))",
-                  fontSize: 12
-                }} />
+                    fill: "hsl(var(--foreground))",
+                    fontSize: 12
+                  }} />
                   <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-
-            {/* Buttons */}
             <div className="flex gap-3 mt-4">
               <Button variant="outline" onClick={() => navigate("/chatroom")}>
                 重試一次
@@ -134,22 +126,32 @@ export default function Feedback() {
             </div>
           </div>
 
-          {/* Right Side - AI Coach Chat */}
-          <div className="w-1/2 flex flex-col gap-4">
-            <div className="flex-1 border rounded-lg p-4">
-              <h2 className="text-lg font-medium mb-4">回顧討論</h2>
-              <div className="space-y-4">
-                {defaultChatHistory.map((message, index) => <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                      <p className="text-sm">{message.content}</p>
-                    </div>
-                  </div>)}
-              </div>
-            </div>
+          {/* Middle - Expert Feedback */}
+          <div className="flex flex-col border rounded-lg p-4">
+            <h2 className="text-lg font-medium mb-4">專家回饋</h2>
+            <ScrollArea className="flex-1">
+              <p className="text-sm text-foreground whitespace-pre-line leading-relaxed pr-3">
+                {defaultExpertFeedback}
+              </p>
+            </ScrollArea>
+          </div>
 
-            {/* User Input Area */}
+          {/* Right - AI Coach Chat */}
+          <div className="flex flex-col gap-4">
+            <div className="flex-1 border rounded-lg p-4 flex flex-col">
+              <h2 className="text-lg font-medium mb-4">回顧討論</h2>
+              <ScrollArea className="flex-1">
+                <div className="space-y-4">
+                  {defaultChatHistory.map((message, index) => <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                        <p className="text-sm">{message.content}</p>
+                      </div>
+                    </div>)}
+                </div>
+              </ScrollArea>
+            </div>
             <div className="border rounded-lg p-4 space-y-3">
-              <Textarea placeholder="輸入文字..." value={userInput} onChange={e => setUserInput(e.target.value)} className="min-h-[100px] resize-none" />
+              <Textarea placeholder="輸入文字..." value={userInput} onChange={e => setUserInput(e.target.value)} className="min-h-[80px] resize-none" />
               <div className="flex justify-end">
                 <Button variant="outline" onClick={handleChatWithExpert}>
                   與專家對話
@@ -159,16 +161,23 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* Bottom Section - Chatroom Transcript, no border */}
-        <div className="mt-8 flex-col flex items-start justify-center">
-          <h2 className="text-xl font-semibold mb-4">教學逐字稿</h2>
-          <div className="space-y-3 max-w-2xl w-full">
-            {defaultTranscript.map((entry, index) => <div key={index}>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {entry.role === "teacher" ? "【老師】" : "【學生】"}
-                </span>
-                <p className="text-sm text-foreground mt-1">{entry.content}</p>
-              </div>)}
+        {/* Bottom Section - Transcript split into Teacher & Student */}
+        <div className="mt-8 grid grid-cols-2 gap-6">
+          <div className="border rounded-lg p-4">
+            <h2 className="text-lg font-medium mb-4">【老師】對話紀錄</h2>
+            <div className="space-y-3">
+              {teacherTranscript.map((entry, index) => <div key={index}>
+                  <p className="text-sm text-foreground">{entry.content}</p>
+                </div>)}
+            </div>
+          </div>
+          <div className="border rounded-lg p-4">
+            <h2 className="text-lg font-medium mb-4">【學生】對話紀錄</h2>
+            <div className="space-y-3">
+              {studentTranscript.map((entry, index) => <div key={index}>
+                  <p className="text-sm text-foreground">{entry.content}</p>
+                </div>)}
+            </div>
           </div>
         </div>
       </div>
