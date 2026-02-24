@@ -104,7 +104,7 @@ const defaultTranscript = [
   },
   {
     role: "student",
-    content: "好，謝謝老師。跟我聯完之後，我覺得心裡沒那麼悶了，明天見。",
+    content: "好，謝謝老師。跟你聊完之後，我覺得心裡沒那麼悶了，明天見。",
   },
 ];
 
