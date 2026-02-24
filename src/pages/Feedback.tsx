@@ -9,23 +9,23 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 const radarData = [
   {
     subject: "負責任的決策",
-    value: 80,
+    value: 85,
   },
   {
     subject: "自我管理",
-    value: 65,
+    value: 75,
   },
   {
     subject: "社會覺察",
-    value: 90,
+    value: 65,
   },
   {
     subject: "關係技巧",
-    value: 70,
+    value: 80,
   },
   {
     subject: "自我覺察",
-    value: 85,
+    value: 92,
   },
 ];
 const defaultChatHistory = [
