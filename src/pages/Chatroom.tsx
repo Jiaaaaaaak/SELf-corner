@@ -105,7 +105,7 @@ export default function Teaching() {
               </div>
               <p className="text-muted-foreground mb-6">請選擇一個你想練習的對話情境</p>
 
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl w-full mb-5">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl w-full mb-4">
                 {displayedScenarios.map((scenario) => (
                   <Card
                     key={scenario.id}
@@ -125,25 +125,25 @@ export default function Teaching() {
                     </CardContent>
                   </Card>
                 ))}
-
-                {/* Random Scenario Card */}
-                <Card
-                  onClick={handleRandomScenario}
-                  className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed ${
-                    isRandomMode
-                      ? "border-primary bg-primary/10 shadow-md"
-                      : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
-                  }`}
-                >
-                  <CardContent className="p-4 text-center space-y-2 flex flex-col items-center justify-center">
-                    <Dices className="h-7 w-7 text-muted-foreground" />
-                    <p className="font-medium text-foreground text-sm leading-tight">隨機情境</p>
-                    <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                      驚喜挑戰
-                    </span>
-                  </CardContent>
-                </Card>
               </div>
+
+              {/* Random Scenario Card - Centered */}
+              <Card
+                onClick={handleRandomScenario}
+                className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed mb-5 ${
+                  isRandomMode
+                    ? "border-primary bg-primary/10 shadow-md"
+                    : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
+                }`}
+              >
+                <CardContent className="px-8 py-3 text-center flex items-center gap-3 justify-center">
+                  <Dices className="h-5 w-5 text-muted-foreground" />
+                  <p className="font-medium text-foreground text-sm">隨機情境</p>
+                  <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                    驚喜挑戰
+                  </span>
+                </CardContent>
+              </Card>
 
               {selectedScenario !== null && !isRandomMode && (
                 <p className="text-sm text-primary font-medium animate-in fade-in">
