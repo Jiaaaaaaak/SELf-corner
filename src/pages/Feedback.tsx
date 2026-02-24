@@ -100,14 +100,14 @@ export default function Feedback() {
   const studentTranscript = defaultTranscript.filter(e => e.role === "student");
 
   return <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-background p-6 max-w-5xl mx-auto">
+        <div className="min-h-screen bg-background p-6 max-w-7xl mx-auto">
         {/* Page Title */}
         <h1 className="text-3xl font-bold mb-6">專家回饋</h1>
 
-        {/* Top Section: 3 columns - Radar | Feedback | Chat, fixed height */}
-        <div className="grid grid-cols-3 gap-6 h-[520px]">
+        {/* Top Section: 3 columns - Radar | Feedback | Chat */}
+        <div className="grid grid-cols-3 gap-6" style={{ height: "520px" }}>
           {/* Left - Radar Chart */}
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full overflow-hidden">
             <h2 className="text-xl font-semibold mb-4">效能分析</h2>
             <div className="flex-1 flex items-center justify-center">
               <ResponsiveContainer width="100%" height={300}>
@@ -132,7 +132,7 @@ export default function Feedback() {
           </div>
 
           {/* Middle - Expert Feedback */}
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full overflow-hidden">
             <h2 className="text-xl font-semibold mb-4">回饋內容</h2>
             <ScrollArea className="flex-1">
               <p className="text-base text-foreground whitespace-pre-line leading-relaxed pr-3">
@@ -142,7 +142,7 @@ export default function Feedback() {
           </div>
 
           {/* Right - AI Coach Chat (keeps border) */}
-          <div className="flex flex-col gap-4 h-full">
+          <div className="flex flex-col gap-4 h-full overflow-hidden">
             <div className="flex-1 border rounded-lg p-4 flex flex-col">
               <h2 className="text-xl font-semibold mb-4">回顧討論</h2>
               <ScrollArea className="flex-1">
