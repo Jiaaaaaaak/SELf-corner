@@ -92,7 +92,7 @@ export default function Teaching() {
           {!isStarted && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/40 backdrop-blur-sm p-8">
               <div className="flex items-center gap-3 mb-2">
-                <h2 className="text-2xl font-semibold text-foreground">選擇練習情境</h2>
+                <h2 className="text-2xl font-bold text-foreground drop-shadow-md">選擇練習情境</h2>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -112,14 +112,14 @@ export default function Teaching() {
                     onClick={() => handleSelectScenario(scenario.id)}
                     className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 ${
                       selectedScenario === scenario.id && !isRandomMode
-                        ? "border-primary bg-foreground/60 backdrop-blur-md shadow-md ring-2 ring-primary"
+                        ? "border-primary bg-card backdrop-blur-md shadow-lg ring-2 ring-primary brightness-110"
                         : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                     }`}
                   >
                     <CardContent className="p-4 text-center space-y-2">
                       <span className="text-3xl">{scenario.emoji}</span>
-                      <p className={`font-medium text-sm leading-tight ${selectedScenario === scenario.id && !isRandomMode ? "text-secondary-foreground font-bold" : "text-foreground"}`}>{scenario.title}</p>
-                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${selectedScenario === scenario.id && !isRandomMode ? "bg-secondary-foreground/20 text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
+                      <p className={`font-medium text-sm leading-tight ${selectedScenario === scenario.id && !isRandomMode ? "text-foreground font-bold" : "text-foreground"}`}>{scenario.title}</p>
+                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${selectedScenario === scenario.id && !isRandomMode ? "bg-primary/30 text-foreground font-semibold" : "bg-muted text-muted-foreground"}`}>
                         {scenario.tag}
                       </span>
                     </CardContent>
@@ -132,14 +132,14 @@ export default function Teaching() {
                 onClick={handleRandomScenario}
                 className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed mb-5 max-w-2xl w-full ${
                   isRandomMode
-                    ? "border-primary bg-foreground/60 backdrop-blur-md shadow-md ring-2 ring-primary"
+                    ? "border-primary bg-card backdrop-blur-md shadow-lg ring-2 ring-primary brightness-110"
                     : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                 }`}
               >
                 <CardContent className="p-4 text-center space-y-2 flex flex-col items-center justify-center">
-                  <Dices className={`h-7 w-7 ${isRandomMode ? "text-secondary-foreground" : "text-muted-foreground"}`} />
-                  <p className={`font-medium text-sm leading-tight ${isRandomMode ? "text-secondary-foreground font-bold" : "text-foreground"}`}>隨機情境</p>
-                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${isRandomMode ? "bg-secondary-foreground/20 text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
+                  <Dices className={`h-7 w-7 ${isRandomMode ? "text-primary" : "text-muted-foreground"}`} />
+                  <p className={`font-medium text-sm leading-tight ${isRandomMode ? "text-foreground font-bold" : "text-foreground"}`}>隨機情境</p>
+                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full ${isRandomMode ? "bg-primary/30 text-foreground font-semibold" : "bg-muted text-muted-foreground"}`}>
                     驚喜挑戰
                   </span>
                 </CardContent>
