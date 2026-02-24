@@ -2,36 +2,59 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shuffle } from "lucide-react";
+import { Shuffle, RefreshCw, Dices } from "lucide-react";
 import HamburgerMenu from "@/components/HamburgerMenu";
 import classroomBackground from "@/assets/classroom-background.png";
 
-const scenarios = [
+// 模擬情境資料庫（未來由後端提供）
+const allScenarios = [
   { id: 1, title: "考場失利後的自責", tag: "自我覺察", emoji: "📝" },
   { id: 2, title: "分組被落單的窘迫", tag: "社交意識", emoji: "👥" },
   { id: 3, title: "被當眾誤解的憤怒", tag: "自我管理", emoji: "😤" },
   { id: 4, title: "好朋友吵架的糾結", tag: "人際技巧", emoji: "🤝" },
   { id: 5, title: "面對新環境的焦慮", tag: "適應能力", emoji: "🌱" },
   { id: 6, title: "承認作弊後的羞愧", tag: "負責決策", emoji: "💭" },
+  { id: 7, title: "被老師點名的緊張", tag: "自我管理", emoji: "😰" },
+  { id: 8, title: "同學說謊的兩難", tag: "負責決策", emoji: "🤔" },
+  { id: 9, title: "排擠他人的罪惡感", tag: "社交意識", emoji: "😔" },
+  { id: 10, title: "比賽輸了的不甘心", tag: "自我覺察", emoji: "🏆" },
 ];
+
+const DISPLAY_COUNT = 6;
+
+function pickRandomScenarios(pool: typeof allScenarios, count: number) {
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
 
 export default function Teaching() {
   const navigate = useNavigate();
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedScenario, setSelectedScenario] = useState<number | null>(null);
+  const [isRandomMode, setIsRandomMode] = useState(false);
+  const [displayedScenarios, setDisplayedScenarios] = useState(() =>
+    pickRandomScenarios(allScenarios, DISPLAY_COUNT)
+  );
 
   const handleSelectScenario = (id: number) => {
     setSelectedScenario(id);
+    setIsRandomMode(false);
   };
 
   const handleRandomScenario = () => {
-    const randomId = scenarios[Math.floor(Math.random() * scenarios.length)].id;
-    setSelectedScenario(randomId);
+    setSelectedScenario(null);
+    setIsRandomMode(true);
+  };
+
+  const handleRefreshScenarios = () => {
+    setDisplayedScenarios(pickRandomScenarios(allScenarios, DISPLAY_COUNT));
+    setSelectedScenario(null);
+    setIsRandomMode(false);
   };
 
   const handleStart = () => {
-    if (selectedScenario === null) return;
+    if (!isRandomMode && selectedScenario === null) return;
     setIsStarted(true);
     setIsPaused(false);
   };
@@ -44,6 +67,7 @@ export default function Teaching() {
     setIsStarted(false);
     setIsPaused(false);
     setSelectedScenario(null);
+    setIsRandomMode(false);
     navigate("/feedback");
   };
 
@@ -67,16 +91,27 @@ export default function Teaching() {
           {/* Scenario Selection Overlay (before start) */}
           {!isStarted && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/40 backdrop-blur-sm p-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-2">選擇練習情境</h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-2xl font-semibold text-foreground">選擇練習情境</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRefreshScenarios}
+                  title="換一批情境"
+                  className="rounded-full"
+                >
+                  <RefreshCw className="h-5 w-5" />
+                </Button>
+              </div>
               <p className="text-muted-foreground mb-6">請選擇一個你想練習的對話情境</p>
 
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 max-w-2xl w-full mb-5">
-                {scenarios.map((scenario) => (
+                {displayedScenarios.map((scenario) => (
                   <Card
                     key={scenario.id}
                     onClick={() => handleSelectScenario(scenario.id)}
                     className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 ${
-                      selectedScenario === scenario.id
+                      selectedScenario === scenario.id && !isRandomMode
                         ? "border-primary bg-primary/10 shadow-md"
                         : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
                     }`}
@@ -94,10 +129,14 @@ export default function Teaching() {
                 {/* Random Scenario Card */}
                 <Card
                   onClick={handleRandomScenario}
-                  className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40`}
+                  className={`cursor-pointer transition-all duration-200 hover:scale-[1.03] hover:shadow-lg border-2 border-dashed ${
+                    isRandomMode
+                      ? "border-primary bg-primary/10 shadow-md"
+                      : "border-border/60 bg-card/80 backdrop-blur-md hover:border-primary/40"
+                  }`}
                 >
                   <CardContent className="p-4 text-center space-y-2 flex flex-col items-center justify-center">
-                    <Shuffle className="h-7 w-7 text-muted-foreground" />
+                    <Dices className="h-7 w-7 text-muted-foreground" />
                     <p className="font-medium text-foreground text-sm leading-tight">隨機情境</p>
                     <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                       驚喜挑戰
@@ -106,9 +145,14 @@ export default function Teaching() {
                 </Card>
               </div>
 
-              {selectedScenario !== null && (
+              {selectedScenario !== null && !isRandomMode && (
                 <p className="text-sm text-primary font-medium animate-in fade-in">
-                  ✨ 已選擇：{scenarios.find((s) => s.id === selectedScenario)?.title}
+                  ✨ 已選擇：{displayedScenarios.find((s) => s.id === selectedScenario)?.title}
+                </p>
+              )}
+              {isRandomMode && (
+                <p className="text-sm text-primary font-medium animate-in fade-in">
+                  🎲 已選擇隨機情境
                 </p>
               )}
             </div>
@@ -131,7 +175,7 @@ export default function Teaching() {
               variant="outline"
               className="h-14"
               onClick={handleStart}
-              disabled={selectedScenario === null}
+              disabled={selectedScenario === null && !isRandomMode}
             >
               開始
             </Button>
