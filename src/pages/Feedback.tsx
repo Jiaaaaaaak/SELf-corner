@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
+
 const radarData = [{
   subject: "清晰度",
   value: 80
@@ -88,6 +89,7 @@ const defaultTranscript = [{
   role: "teacher",
   content: "光合作用主要分為兩個階段：光反應和暗反應。光反應需要光照，發生在類囊體膜上；暗反應不需要直接光照，發生在葉綠體基質中。我們下次課再詳細討論這兩個階段。"
 }];
+
 export default function Feedback() {
   const navigate = useNavigate();
   const [userInput, setUserInput] = useState("");
@@ -99,18 +101,21 @@ export default function Feedback() {
 
   return <ScrollArea className="h-screen">
       <div className="min-h-screen bg-background p-6 max-w-5xl mx-auto">
-        {/* Top Section: 3 columns - Radar | Feedback | Chat */}
-        <div className="grid grid-cols-3 gap-6">
+        {/* Page Title */}
+        <h1 className="text-3xl font-bold mb-6">專家回饋</h1>
+
+        {/* Top Section: 3 columns - Radar | Feedback | Chat, fixed height */}
+        <div className="grid grid-cols-3 gap-6 h-[520px]">
           {/* Left - Radar Chart */}
-          <div className="flex flex-col border rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-4">效能分析</h2>
+          <div className="flex flex-col h-full">
+            <h2 className="text-xl font-semibold mb-4">效能分析</h2>
             <div className="flex-1 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={300}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="hsl(var(--border))" />
                   <PolarAngleAxis dataKey="subject" tick={{
                     fill: "hsl(var(--foreground))",
-                    fontSize: 12
+                    fontSize: 14
                   }} />
                   <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} />
                 </RadarChart>
@@ -127,31 +132,31 @@ export default function Feedback() {
           </div>
 
           {/* Middle - Expert Feedback */}
-          <div className="flex flex-col border rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-4">專家回饋</h2>
+          <div className="flex flex-col h-full">
+            <h2 className="text-xl font-semibold mb-4">回饋內容</h2>
             <ScrollArea className="flex-1">
-              <p className="text-sm text-foreground whitespace-pre-line leading-relaxed pr-3">
+              <p className="text-base text-foreground whitespace-pre-line leading-relaxed pr-3">
                 {defaultExpertFeedback}
               </p>
             </ScrollArea>
           </div>
 
-          {/* Right - AI Coach Chat */}
-          <div className="flex flex-col gap-4">
+          {/* Right - AI Coach Chat (keeps border) */}
+          <div className="flex flex-col gap-4 h-full">
             <div className="flex-1 border rounded-lg p-4 flex flex-col">
-              <h2 className="text-lg font-medium mb-4">回顧討論</h2>
+              <h2 className="text-xl font-semibold mb-4">回顧討論</h2>
               <ScrollArea className="flex-1">
                 <div className="space-y-4">
                   {defaultChatHistory.map((message, index) => <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                       <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                        <p className="text-sm">{message.content}</p>
+                        <p className="text-base">{message.content}</p>
                       </div>
                     </div>)}
                 </div>
               </ScrollArea>
             </div>
             <div className="border rounded-lg p-4 space-y-3">
-              <Textarea placeholder="輸入文字..." value={userInput} onChange={e => setUserInput(e.target.value)} className="min-h-[80px] resize-none" />
+              <Textarea placeholder="輸入文字..." value={userInput} onChange={e => setUserInput(e.target.value)} className="min-h-[80px] resize-none text-base" />
               <div className="flex justify-end">
                 <Button variant="outline" onClick={handleChatWithExpert}>
                   與專家對話
@@ -163,19 +168,19 @@ export default function Feedback() {
 
         {/* Bottom Section - Transcript split into Teacher & Student */}
         <div className="mt-8 grid grid-cols-2 gap-6">
-          <div className="border rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-4">【老師】對話紀錄</h2>
+          <div className="p-4">
+            <h2 className="text-xl font-semibold mb-4">【老師】對話紀錄</h2>
             <div className="space-y-3">
               {teacherTranscript.map((entry, index) => <div key={index}>
-                  <p className="text-sm text-foreground">{entry.content}</p>
+                  <p className="text-base text-foreground">{entry.content}</p>
                 </div>)}
             </div>
           </div>
-          <div className="border rounded-lg p-4">
-            <h2 className="text-lg font-medium mb-4">【學生】對話紀錄</h2>
+          <div className="p-4">
+            <h2 className="text-xl font-semibold mb-4">【學生】對話紀錄</h2>
             <div className="space-y-3">
               {studentTranscript.map((entry, index) => <div key={index}>
-                  <p className="text-sm text-foreground">{entry.content}</p>
+                  <p className="text-base text-foreground">{entry.content}</p>
                 </div>)}
             </div>
           </div>
