@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 
 const radarData = [{
@@ -105,12 +106,12 @@ export default function Feedback() {
         <h1 className="text-3xl font-bold mb-6">專家回饋</h1>
 
         {/* Top Section: 3 columns - Radar | Feedback | Chat */}
-        <div className="grid grid-cols-3 gap-6" style={{ height: "520px" }}>
+        <div className="grid grid-cols-3 gap-6" style={{ height: "620px" }}>
           {/* Left - Radar Chart */}
           <div className="flex flex-col h-full overflow-hidden">
             <h2 className="text-xl font-semibold mb-4">效能分析</h2>
             <div className="flex-1 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={350}>
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="hsl(var(--border))" />
                   <PolarAngleAxis dataKey="subject" tick={{
@@ -141,21 +142,19 @@ export default function Feedback() {
             </ScrollArea>
           </div>
 
-          {/* Right - AI Coach Chat (keeps border) */}
-          <div className="flex flex-col gap-4 h-full overflow-hidden">
-            <div className="flex-1 border rounded-lg p-4 flex flex-col">
-              <h2 className="text-xl font-semibold mb-4">回顧討論</h2>
-              <ScrollArea className="flex-1">
-                <div className="space-y-4">
-                  {defaultChatHistory.map((message, index) => <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
-                        <p className="text-base">{message.content}</p>
-                      </div>
-                    </div>)}
-                </div>
-              </ScrollArea>
-            </div>
-            <div className="border rounded-lg p-4 space-y-3">
+          {/* Right - AI Coach Chat (merged chat + input) */}
+          <div className="flex flex-col h-full overflow-hidden border rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-4">回顧討論</h2>
+            <ScrollArea className="flex-1 mb-3">
+              <div className="space-y-4">
+                {defaultChatHistory.map((message, index) => <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>
+                      <p className="text-base">{message.content}</p>
+                    </div>
+                  </div>)}
+              </div>
+            </ScrollArea>
+            <div className="space-y-3 border-t pt-3">
               <Textarea placeholder="輸入文字..." value={userInput} onChange={e => setUserInput(e.target.value)} className="min-h-[80px] resize-none text-base" />
               <div className="flex justify-end">
                 <Button variant="outline" onClick={handleChatWithExpert}>
@@ -166,24 +165,55 @@ export default function Feedback() {
           </div>
         </div>
 
-        {/* Bottom Section - Transcript split into Teacher & Student */}
-        <div className="mt-8 grid grid-cols-2 gap-6">
-          <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">【老師】對話紀錄</h2>
-            <div className="space-y-3">
-              {teacherTranscript.map((entry, index) => <div key={index}>
-                  <p className="text-base text-foreground">{entry.content}</p>
-                </div>)}
+        {/* Bottom Section - Transcript with toggle */}
+        <div className="mt-8">
+          <Tabs defaultValue="combined">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">對話紀錄</h2>
+              <TabsList>
+                <TabsTrigger value="combined">完整對話</TabsTrigger>
+                <TabsTrigger value="separate">分開檢視</TabsTrigger>
+              </TabsList>
             </div>
-          </div>
-          <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">【學生】對話紀錄</h2>
-            <div className="space-y-3">
-              {studentTranscript.map((entry, index) => <div key={index}>
-                  <p className="text-base text-foreground">{entry.content}</p>
-                </div>)}
-            </div>
-          </div>
+
+            {/* Combined view - back and forth */}
+            <TabsContent value="combined">
+              <div className="space-y-4 p-4">
+                {defaultTranscript.map((entry, index) => (
+                  <div key={index} className={`flex ${entry.role === "teacher" ? "justify-start" : "justify-end"}`}>
+                    <div className={`max-w-[70%] rounded-lg px-4 py-3 ${entry.role === "teacher" ? "bg-primary/10 text-foreground" : "bg-muted text-foreground"}`}>
+                      <p className="text-xs font-semibold mb-1 text-muted-foreground">
+                        {entry.role === "teacher" ? "👩‍🏫 老師" : "🧑‍🎓 學生"}
+                      </p>
+                      <p className="text-base">{entry.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+
+            {/* Separate view - teacher & student columns */}
+            <TabsContent value="separate">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-4">【老師】對話紀錄</h3>
+                  <div className="space-y-3">
+                    {teacherTranscript.map((entry, index) => <div key={index}>
+                        <p className="text-base text-foreground">{entry.content}</p>
+                      </div>)}
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-4">【學生】對話紀錄</h3>
+                  <div className="space-y-3">
+                    {studentTranscript.map((entry, index) => <div key={index}>
+                        <p className="text-base text-foreground">{entry.content}</p>
+                      </div>)}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </ScrollArea>;
