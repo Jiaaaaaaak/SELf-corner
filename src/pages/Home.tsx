@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function Home() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [instructionOpen, setInstructionOpen] = useState(false);
 
   // Mock user data
   const user = {
@@ -18,17 +16,6 @@ export default function Home() {
     avatar: "",
     usageCount: 8,
   };
-
-  // Mock history data
-  const historyItems = [
-    { id: 1, date: "2026-02-01", topic: "數學課程" },
-    { id: 2, date: "2026-01-30", topic: "物理課程" },
-    { id: 3, date: "2026-01-28", topic: "化學課程" },
-  ];
-
-  const filteredHistory = historyItems.filter(
-    (item) => item.topic.toLowerCase().includes(searchQuery.toLowerCase()) || item.date.includes(searchQuery),
-  );
 
   const handleLogout = () => {
     navigate("/login");
@@ -51,40 +38,9 @@ export default function Home() {
       </div>
 
       <div className="flex gap-6">
-        {/* Left Content - History */}
+        {/* Left Content - Empty */}
         <Card className="flex-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">History</CardTitle>
-          </CardHeader>
-          <Separator />
-          <CardContent className="pt-4">
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="搜尋歷史紀錄..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <div className="space-y-2">
-              {filteredHistory.map((item) => (
-                <div key={item.id} className="py-2 border-b border-dashed border-border last:border-0">
-                  <span className="text-sm text-muted-foreground">{item.date}</span>
-                  <span className="ml-4">{item.topic}</span>
-                </div>
-              ))}
-              {filteredHistory.length === 0 && searchQuery && (
-                <div className="py-2 text-muted-foreground text-sm">找不到符合的紀錄</div>
-              )}
-              {/* Empty placeholder rows */}
-              {[...Array(Math.max(0, 5 - filteredHistory.length))].map((_, i) => (
-                <div key={`empty-${i}`} className="py-2 border-b border-dashed border-border">
-                  <span className="text-muted-foreground/30">---</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
+          <CardContent className="p-6" />
         </Card>
 
         {/* Right Sidebar - Action Buttons */}
@@ -92,7 +48,7 @@ export default function Home() {
           <Button variant="outline" className="w-full justify-center h-12" onClick={() => navigate("/chatroom")}>
             開始對話
           </Button>
-          <Button variant="outline" className="w-full justify-center h-12">
+          <Button variant="outline" className="w-full justify-center h-12" onClick={() => setInstructionOpen(true)}>
             使用說明
           </Button>
           <div className="text-center py-2">
@@ -105,6 +61,24 @@ export default function Home() {
           </Button>
         </div>
       </div>
+
+      <Dialog open={instructionOpen} onOpenChange={setInstructionOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>使用說明</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground">
+            <p>歡迎使用本系統！以下是基本操作說明：</p>
+            <ul className="list-disc list-inside space-y-2">
+              <li>首頁：查看您的使用紀錄和基本資訊</li>
+              <li>歷史紀錄：瀏覽過去的對話記錄</li>
+              <li>個人資料：管理您的帳戶設定</li>
+              <li>對話空間：開始新的教學對話</li>
+            </ul>
+            <p>如有任何問題，請聯繫客服支援。</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
