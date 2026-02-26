@@ -1,73 +1,35 @@
-# Welcome to your Lovable project
+# 🏫 SELf-corner 虛擬教室前端專案
 
-## Project info
+歡迎來到我們的虛擬教室 (Virtual Classroom) 專案！本專案的前端主要是透過 [Lovable AI](https://lovable.dev/) 輔助開發，並結合 n8n 等自動化技術來打造的全新平台。
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+為了維持專案架構的穩定與 AI 協作的順暢，**目前由特定負責人統一操作 Lovable 進行主體架構的生成與版本同步**。其他團隊成員請透過標準的 Git 流程，直接在地端進行開發、測試與 Code Review。
 
-## How can I edit this code?
+## 💻 專案使用的技術棧
 
-There are several ways of editing your application.
+本專案的前端主要建構於以下技術：
+- **Vite** (極速的前端建置工具)
+- **TypeScript** (提供強型別的 JavaScript，減少 Bug)
+- **React** (前端 UI 框架)
+- **shadcn-ui** (高品質的客製化 UI 元件庫)
+- **Tailwind CSS** (Utility-first CSS 樣式框架)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🛠️ 如何參與開發與測試？
 
-Changes made via Lovable will be committed automatically to this repo.
+請將專案下載到你的電腦上進行本機端的作業。
+**(前置作業：請確保你的電腦已安裝 Node.js 與 npm)**
 
-**Use your preferred IDE**
+**開發環境建置步驟：**
+```bash
+# 步驟 1：Clone 這個專案到你的電腦 (僅第一次需要)
+git clone -b frontend_jia https://github.com/AIPE02-team04/ai-classroom.git
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# 步驟 2：進入專案資料夾
+cd SELf-corner
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+# 步驟 3：安裝所有依賴套件 (很重要！)
+npm install
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 步驟 4：啟動本地端開發伺服器
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
