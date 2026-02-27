@@ -42,10 +42,20 @@
          <h1 className="text-2xl font-semibold">個人資料</h1>
        </div>
  
-       <Card className="max-w-lg">
-         <CardHeader>
-           <CardTitle className="text-lg font-medium">基本資訊</CardTitle>
-         </CardHeader>
+        {/* Usage Count Card */}
+        <Card className="max-w-lg mb-6">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">使用次數</p>
+              <p className="text-3xl font-bold">8</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="max-w-lg">
+          <CardHeader>
+            <CardTitle className="text-lg font-medium">基本資訊</CardTitle>
+          </CardHeader>
          <Separator />
          <CardContent className="pt-6">
            <div className="flex flex-col items-center gap-4 mb-6">

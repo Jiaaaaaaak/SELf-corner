@@ -1,84 +1,78 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import HamburgerMenu from "@/components/HamburgerMenu";
 
 export default function Home() {
   const navigate = useNavigate();
-  const [instructionOpen, setInstructionOpen] = useState(false);
 
-  // Mock user data
   const user = {
     name: "User",
     avatar: "",
-    usageCount: 8,
-  };
-
-  const handleLogout = () => {
-    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen bg-background p-6 max-w-5xl mx-auto">
-      {/* Header with Hamburger Menu, Avatar, Greeting and Usage Count */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <HamburgerMenu />
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback className="bg-muted text-muted-foreground">
-              {user.name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-lg">hi, {user.name}</span>
-        </div>
+    <div className="min-h-screen bg-background p-6 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8">
+        <HamburgerMenu />
+        <Avatar className="h-12 w-12">
+          <AvatarImage src={user.avatar} alt={user.name} />
+          <AvatarFallback className="bg-muted text-muted-foreground">
+            {user.name.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <span className="text-lg">hi, {user.name}</span>
       </div>
 
-      <div className="flex gap-6">
-        {/* Left Content - Empty */}
-        <Card className="flex-1">
-          <CardContent className="p-6" />
-        </Card>
+      {/* About Us Section */}
+      <section className="space-y-8">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-bold">關於 SELf-corner</h1>
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            一個為教師設計的 SEL（社會情緒學習）對話練習平台
+          </p>
+        </div>
 
-        {/* Right Sidebar - Action Buttons */}
-        <div className="w-32 space-y-3 flex flex-col justify-center">
-          <Button variant="outline" className="w-full justify-center h-12" onClick={() => navigate("/chatroom")}>
-            開始對話
-          </Button>
-          <Button variant="outline" className="w-full justify-center h-12" onClick={() => setInstructionOpen(true)}>
-            使用說明
-          </Button>
-          <div className="text-center py-2">
-            <div className="text-sm text-muted-foreground">使用次數</div>
-            <div className="text-2xl font-semibold">{user.usageCount}</div>
+        <Separator />
+
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">🎯 平台初衷</h2>
+            <p className="text-foreground leading-relaxed">
+              在教育現場，老師們經常面臨學生的情緒事件——考試焦慮、人際衝突、自我懷疑。然而，如何有效回應這些情境，往往缺乏系統化的練習機會。SELf-corner 希望透過模擬真實的師生對話場景，讓教師在安全的環境中反覆練習，提升社會情緒輔導的敏感度與技巧。
+            </p>
           </div>
-          <div className="flex-1" />
-          <Button variant="outline" className="w-full justify-center h-12" onClick={handleLogout}>
-            登出
-          </Button>
-        </div>
-      </div>
 
-      <Dialog open={instructionOpen} onOpenChange={setInstructionOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>使用說明</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 text-sm text-muted-foreground">
-            <p>歡迎使用本系統！以下是基本操作說明：</p>
-            <ul className="list-disc list-inside space-y-2">
-              <li>首頁：查看您的使用紀錄和基本資訊</li>
-              <li>歷史紀錄：瀏覽過去的對話記錄</li>
-              <li>個人資料：管理您的帳戶設定</li>
-              <li>對話空間：開始新的教學對話</li>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">💡 我們相信</h2>
+            <p className="text-foreground leading-relaxed">
+              每一位老師都有能力成為學生情緒成長的引路人。透過 AI 模擬的虛擬學生，教師可以在不同情境中練習傾聽、同理與引導，並獲得即時的專家回饋，逐步建立更自信的輔導能力。
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">🌱 五大 SEL 核心能力</h2>
+            <p className="text-foreground leading-relaxed">
+              本平台的情境設計圍繞 CASEL 提出的五大社會情緒學習核心能力：
+            </p>
+            <ul className="list-disc list-inside text-foreground space-y-1 ml-2">
+              <li><strong>自我覺察</strong>——辨識自身情緒與想法</li>
+              <li><strong>自我管理</strong>——有效調節情緒與行為</li>
+              <li><strong>社交意識</strong>——理解他人觀點與感受</li>
+              <li><strong>人際技巧</strong>——建立健康的溝通與關係</li>
+              <li><strong>負責決策</strong>——做出具倫理與建設性的選擇</li>
             </ul>
-            <p>如有任何問題，請聯繫客服支援。</p>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">🔧 如何運作</h2>
+            <p className="text-foreground leading-relaxed">
+              選擇一個對話情境，與 AI 虛擬學生進行模擬對話。對話結束後，系統將根據您的回應提供 SEL 指標分析與專家建議，幫助您持續精進輔導技能。
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
