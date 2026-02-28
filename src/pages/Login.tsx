@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, BookHeart } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -104,18 +104,28 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">登入</CardTitle>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <div className="mb-8 text-center max-w-md animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex justify-center mb-4 text-primary">
+          <BookHeart className="h-12 w-12" />
+        </div>
+        <h1 className="text-4xl font-bold text-foreground mb-2">SELf-corner</h1>
+        <p className="text-lg text-muted-foreground">每個老師，都需要一個能安心犯錯的角落。</p>
+      </div>
+
+      <Card className="w-full max-w-md shadow-lg border-muted/50 bg-card/80 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-500 delay-150 fill-mode-both">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="text-2xl text-foreground">歡迎回來</CardTitle>
+          <CardDescription>登入您的帳號以繼續練習</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-5">
             <Input
               type="text"
-              placeholder="帳號"
+              placeholder="帳號 / Email"
               value={account}
               onChange={(e) => setAccount(e.target.value)}
+              className="bg-background"
             />
             <div className="relative">
               <Input
@@ -123,44 +133,53 @@ export default function Login() {
                 placeholder="密碼"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="bg-background"
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setShowLoginPassword(!showLoginPassword)}
               >
                 {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            <div className="flex items-center gap-2">
-              <Button type="submit" variant="outline" size="sm">
+            <div className="flex items-center justify-between pt-2">
+              <Button type="submit" className="w-1/2">
                 登入
               </Button>
-              <span className="text-sm text-muted-foreground">
+              <div className="flex gap-2 text-sm text-muted-foreground">
                 <button
                   type="button"
-                  className="hover:underline"
+                  className="hover:text-primary transition-colors"
                   onClick={() => setRegisterOpen(true)}
                 >
                   註冊
                 </button>
-                {" | "}
+                <span>|</span>
                 <button
                   type="button"
-                  className="hover:underline"
+                  className="hover:text-primary transition-colors"
                   onClick={() => setForgotOpen(true)}
                 >
                   忘記密碼
                 </button>
-              </span>
+              </div>
+            </div>
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">或使用</span>
+              </div>
             </div>
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full bg-background"
               onClick={handleGoogleLogin}
             >
-              Login with Google
+              Google 帳號登入
             </Button>
           </form>
         </CardContent>
@@ -170,7 +189,7 @@ export default function Login() {
       <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>註冊</DialogTitle>
+            <DialogTitle>建立新帳號</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleRegister} className="space-y-3">
             <div>
@@ -244,8 +263,8 @@ export default function Login() {
               </div>
               {regErrors.confirmPassword && <p className="text-sm text-destructive mt-1">{regErrors.confirmPassword}</p>}
             </div>
-            <DialogFooter>
-              <Button type="submit">註冊</Button>
+            <DialogFooter className="pt-2">
+              <Button type="submit" className="w-full">註冊並開始練習</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -267,8 +286,8 @@ export default function Login() {
               value={forgotEmail}
               onChange={(e) => setForgotEmail(e.target.value)}
             />
-            <DialogFooter>
-              <Button type="submit">發送驗證信</Button>
+            <DialogFooter className="pt-2">
+              <Button type="submit" className="w-full">發送驗證信</Button>
             </DialogFooter>
           </form>
         </DialogContent>

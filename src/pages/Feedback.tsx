@@ -4,51 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { MessageCircleHeart, Activity, ArrowRight, Lightbulb, Sparkles } from "lucide-react";
+import HamburgerMenu from "@/components/HamburgerMenu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const radarData = [
-  {
-    subject: "負責任的決策",
-    value: 85,
-  },
-  {
-    subject: "自我管理",
-    value: 75,
-  },
-  {
-    subject: "社會覺察",
-    value: 65,
-  },
-  {
-    subject: "關係技巧",
-    value: 80,
-  },
-  {
-    subject: "自我覺察",
-    value: 92,
-  },
+  { subject: "自我覺察 (SEL)", value: 92 },
+  { subject: "一致性表達 (Satir)", value: 75 },
+  { subject: "社會覺察 (SEL)", value: 65 },
+  { subject: "同理心與連結 (Satir)", value: 80 },
+  { subject: "情緒調節 (SEL)", value: 85 },
 ];
+
 const defaultChatHistory = [
   {
     role: "assistant",
-    content: "您好，我是您的教育顧問專家，對於剛剛的回顧有任何問題都歡迎問我~",
+    content: "老師辛苦了！這是一場不容易的對話。關於剛剛的分析報告，或是針對小傑的情況，您有任何想進一步討論的嗎？",
   },
 ];
-const defaultExpertFeedback = `1. 從「生理覺察」切入，建立情緒儀表板
-老師在第 5 句精準地捕捉了學生提到的「手心冒汗」。
-建議：老師可以更進一步引導學生建立「情緒預警系統」。
-具體作法：問學生：「除了手心冒汗，你的肩膀會緊繃嗎？還是肚子會緊緊的？」幫助學生在情緒爆炸的前 30 秒（黃金冷靜期）就透過身體訊號發現問題，而不僅是事後回顧。
 
-2. 深化「我訊息（I-Message）」的層次
-在第 9 句中，老師提議了「我訊息」。
-建議：確保「我訊息」包含三個核心元素：情緒 + 行為 + 需求。
-優化後的說法：「小明，我現在因為小考沒寫完感到很煩躁（情緒），如果你現在一直問我問題（行為），我會沒辦法冷靜，我需要五分鐘安靜一下（需求）。」
-理由：清楚的需求表達能降低對方的防衛心，減少誤解。
-
-3. 將「道歉」升級為「修復行為」
-在第 11 句，學生主動提出道歉，這很棒。
-建議：訓練家提醒老師，道歉不只是說對不起，而是「修補關係的裂痕」。
-引導練習：老師可以多問一句：「你覺得除了道歉，明天幫小明拿個作業，或是主動跟他打個招呼，哪種方式能讓他感覺到你真的不在意剛才的事了？」這能培養學生的「社會覺察（Social Awareness）」，理解行為對他人的後續影響。`;
 const defaultTranscript = [
   {
     role: "teacher",
@@ -63,6 +38,8 @@ const defaultTranscript = [
     role: "teacher",
     content:
       "聽起來你現在覺得很有壓力，甚至覺得有點委屈，對嗎？當你覺得『大家都在針對你』的時候，心裡面是什麼感覺？是生氣、挫折，還是覺得累了？",
+    highlight: true,
+    note: "很好的情緒指認！幫助學生進行自我覺察。",
   },
   {
     role: "student",
@@ -92,6 +69,8 @@ const defaultTranscript = [
     role: "teacher",
     content:
       "這是一個很好的策略！暫時離開現場能讓大腦冷靜下來。至於小明，你覺得如果用『我訊息』來表達會不會比較好？例如：『我現在心情不太好，需要安靜一下，等下再聊』，這樣既表達了你的邊界，又不會傷害到關係。你覺得他聽完會有什麼反應？",
+    highlight: true,
+    note: "引入了『我訊息』，但在薩提爾模式中，可以再更深入探討學生的『渴望』(被尊重)。",
   },
   {
     role: "student",
@@ -118,136 +97,220 @@ export default function Feedback() {
   const studentTranscript = defaultTranscript.filter((e) => e.role === "student");
 
   return (
-    <ScrollArea className="h-screen">
-      <div className="min-h-screen bg-background p-6 max-w-7xl mx-auto">
-        {/* Page Title */}
-        <h1 className="text-3xl font-bold mb-6">專家回饋</h1>
-
-        {/* Top Section: 3 columns - Radar | Feedback | Chat */}
-        <div className="grid grid-cols-3 gap-6" style={{ height: "620px" }}>
-          {/* Left - Radar Chart */}
-          <div className="flex flex-col h-full overflow-hidden">
-            <h2 className="text-xl font-semibold mb-4">SEL 指標分析</h2>
-            <div className="flex-1 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height={350}>
-                <RadarChart data={radarData}>
-                  <PolarGrid stroke="hsl(var(--border))" />
-                  <PolarAngleAxis
-                    dataKey="subject"
-                    tick={{
-                      fill: "hsl(var(--foreground))",
-                      fontSize: 14,
-                    }}
-                  />
-                  <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex gap-3 mt-4">
-              <Button variant="outline" onClick={() => navigate("/chatroom")}>
-                重試一次
-              </Button>
-              <Button variant="outline" onClick={() => navigate("/home")}>
-                回首頁
-              </Button>
-            </div>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <HamburgerMenu />
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-accent" />
+              對話分析報告
+            </h1>
           </div>
-
-          {/* Middle - Expert Feedback */}
-          <div className="flex flex-col h-full overflow-hidden">
-            <h2 className="text-xl font-semibold mb-4">回饋內容</h2>
-            <ScrollArea className="flex-1">
-              <p className="text-base text-foreground whitespace-pre-line leading-relaxed pr-3">
-                {defaultExpertFeedback}
-              </p>
-            </ScrollArea>
-          </div>
-
-          {/* Right - AI Coach Chat (merged chat + input) */}
-          <div className="flex flex-col h-full overflow-hidden border rounded-lg p-4">
-            <h2 className="text-xl font-semibold mb-4">回顧討論</h2>
-            <ScrollArea className="flex-1 mb-3">
-              <div className="space-y-4">
-                {defaultChatHistory.map((message, index) => (
-                  <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}
-                    >
-                      <p className="text-base">{message.content}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-            <div className="space-y-3 border-t pt-3">
-              <Textarea
-                placeholder="輸入文字..."
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                className="min-h-[80px] resize-none text-base"
-              />
-              <div className="flex justify-end">
-                <Button variant="outline" onClick={handleChatWithExpert}>
-                  與專家對話
-                </Button>
-              </div>
-            </div>
+          <div className="flex gap-3">
+            <Button variant="outline" className="rounded-full bg-card" onClick={() => navigate("/chatroom")}>
+              再練習一次
+            </Button>
+            <Button className="rounded-full" onClick={() => navigate("/home")}>
+              回首頁
+            </Button>
           </div>
         </div>
 
-        {/* Bottom Section - Transcript with toggle */}
-        <div className="mt-8">
-          <Tabs defaultValue="combined">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">對話紀錄</h2>
-              <TabsList>
-                <TabsTrigger value="combined">完整對話</TabsTrigger>
-                <TabsTrigger value="separate">分開檢視</TabsTrigger>
-              </TabsList>
-            </div>
+        {/* Top Section: Radar & Actionable Advice */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          
+          {/* Left - Radar Chart (Satir & SEL) */}
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="h-5 w-5 text-primary" />
+                能力雷達圖 (SEL & 薩提爾模式)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={radarData} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                    <PolarGrid stroke="hsl(var(--border))" />
+                    <PolarAngleAxis
+                      dataKey="subject"
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 13, fontWeight: 600 }}
+                    />
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1)' }} />
+                    <Radar name="本次表現" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2} fill="hsl(var(--primary))" fillOpacity={0.2} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Combined view - back and forth */}
-            <TabsContent value="combined">
-              <div className="space-y-4 p-4">
-                {defaultTranscript.map((entry, index) => (
-                  <div key={index} className={`flex ${entry.role === "teacher" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[70%] rounded-lg px-4 py-3 ${entry.role === "teacher" ? "bg-primary/10 text-foreground" : "bg-muted text-foreground"}`}
-                    >
-                      <p className="text-xs font-semibold mb-1 text-muted-foreground">
-                        {entry.role === "teacher" ? "👩‍🏫 老師" : "🧑‍🎓 學生"}
+          {/* Right - Actionable Advice */}
+          <Card className="border-border/60 shadow-sm bg-primary/5">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-primary" />
+                專家建議：原本怎麼說更好？
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[300px] pr-4">
+                <div className="space-y-6">
+                  <div className="space-y-2 bg-card p-4 rounded-xl border border-border/50">
+                    <h3 className="font-bold text-foreground">💡 1. 建立「情緒預警系統」</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      老師精準捕捉到了「手心冒汗」。建議進一步引導學生在情緒爆炸前 30 秒（黃金冷靜期）就發現問題。
+                    </p>
+                    <div className="bg-primary/10 p-3 rounded-lg flex items-start gap-2 mt-2">
+                      <ArrowRight className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <p className="text-sm font-medium text-foreground">
+                        換句話說：「除了手心冒汗，你的肩膀會緊繃嗎？下次如果肩膀又緊緊的，我們能做什麼？」
                       </p>
-                      <p className="text-base">{entry.content}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </TabsContent>
 
-            {/* Separate view - teacher & student columns aligned row by row */}
-            <TabsContent value="separate">
-              <div className="grid grid-cols-2 gap-6 px-4 pb-2">
-                <h3 className="text-lg font-semibold">【老師】對話紀錄</h3>
-                <h3 className="text-lg font-semibold">【學生】對話紀錄</h3>
-              </div>
-              {Array.from({ length: Math.max(teacherTranscript.length, studentTranscript.length) }).map((_, index) => (
-                <div key={index} className="grid grid-cols-2 gap-6">
-                  <div className="px-4 py-3 border-b border-border min-h-[60px] flex items-start">
-                    {teacherTranscript[index] && (
-                      <p className="text-base text-foreground">{teacherTranscript[index].content}</p>
-                    )}
-                  </div>
-                  <div className="px-4 py-3 border-b border-border min-h-[60px] flex items-start">
-                    {studentTranscript[index] && (
-                      <p className="text-base text-foreground">{studentTranscript[index].content}</p>
-                    )}
+                  <div className="space-y-2 bg-card p-4 rounded-xl border border-border/50">
+                    <h3 className="font-bold text-foreground">💡 2. 深化薩提爾的「渴望」層次</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      老師提議了「我訊息」，但學生提到「不想讓他覺得我好欺負」，這反映了冰山底層對「被尊重」的渴望。
+                    </p>
+                    <div className="bg-primary/10 p-3 rounded-lg flex items-start gap-2 mt-2">
+                      <ArrowRight className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <p className="text-sm font-medium text-foreground">
+                        換句話說：「聽起來你很在意他是否尊重你（渴望）。我們怎麼表達『我需要安靜』，同時也能展現你的力量？」
+                      </p>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </TabsContent>
-          </Tabs>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bottom Section: Transcript & AI Coach */}
+        <div className="grid lg:grid-cols-3 gap-6 h-[500px]">
+          
+          {/* Transcript */}
+          <Card className="lg:col-span-2 border-border/60 shadow-sm flex flex-col h-full overflow-hidden">
+            <CardHeader className="py-4 border-b border-border/50">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">對話逐字稿回顧</CardTitle>
+                <Tabs defaultValue="combined" className="w-[200px]">
+                  <TabsList className="grid w-full grid-cols-2 h-8">
+                    <TabsTrigger value="combined" className="text-xs">完整</TabsTrigger>
+                    <TabsTrigger value="separate" className="text-xs">對照</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 p-0 overflow-hidden relative">
+              {/* Overlay shadow for scrolling */}
+              <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-card to-transparent z-10 pointer-events-none"></div>
+              <ScrollArea className="h-full px-6 py-4">
+                <Tabs defaultValue="combined" className="w-full">
+                  <TabsContent value="combined" className="m-0 space-y-4">
+                    {defaultTranscript.map((entry, index) => (
+                      <div key={index} className={`flex flex-col ${entry.role === "teacher" ? "items-end" : "items-start"}`}>
+                        <div
+                          className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${
+                            entry.role === "teacher" 
+                              ? "bg-primary/10 border border-primary/20 rounded-br-sm" 
+                              : "bg-muted border border-border rounded-bl-sm"
+                          } ${entry.highlight ? 'ring-2 ring-accent ring-offset-2 ring-offset-card' : ''}`}
+                        >
+                          <p className="text-[10px] font-bold mb-1 uppercase tracking-wider text-muted-foreground">
+                            {entry.role === "teacher" ? "👩‍🏫 老師" : "🧑‍🎓 學生"}
+                          </p>
+                          <p className="text-base text-foreground leading-relaxed">{entry.content}</p>
+                        </div>
+                        {entry.highlight && entry.note && (
+                          <div className="mt-2 max-w-[75%] bg-accent/20 text-accent-foreground text-xs px-3 py-1.5 rounded-lg font-medium border border-accent/30 flex items-center gap-1">
+                            <Sparkles className="h-3 w-3" />
+                            {entry.note}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </TabsContent>
+                  <TabsContent value="separate" className="m-0">
+                    <div className="grid grid-cols-2 gap-4 pb-2 border-b border-border/50 sticky top-0 bg-card z-20">
+                      <div className="font-bold text-center text-primary">👩‍🏫 老師</div>
+                      <div className="font-bold text-center text-muted-foreground">🧑‍🎓 學生</div>
+                    </div>
+                    <div className="pt-4 space-y-4">
+                      {Array.from({ length: Math.max(teacherTranscript.length, studentTranscript.length) }).map((_, index) => (
+                        <div key={index} className="grid grid-cols-2 gap-6 relative">
+                          {/* Connecting line */}
+                          <div className="absolute left-1/2 top-4 bottom-[-1rem] w-px bg-border/50 -translate-x-1/2"></div>
+                          
+                          <div className="flex justify-end">
+                            {teacherTranscript[index] && (
+                              <div className={`bg-primary/10 border border-primary/20 rounded-2xl rounded-tr-sm p-3 shadow-sm w-[90%] relative ${teacherTranscript[index].highlight ? 'ring-2 ring-accent' : ''}`}>
+                                <p className="text-sm text-foreground">{teacherTranscript[index].content}</p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex justify-start">
+                            {studentTranscript[index] && (
+                              <div className="bg-muted border border-border rounded-2xl rounded-tl-sm p-3 shadow-sm w-[90%] relative">
+                                <p className="text-sm text-foreground">{studentTranscript[index].content}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </ScrollArea>
+              <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-card to-transparent z-10 pointer-events-none"></div>
+            </CardContent>
+          </Card>
+
+          {/* AI Coach */}
+          <Card className="border-border/60 shadow-sm flex flex-col h-full overflow-hidden bg-secondary/5">
+            <CardHeader className="py-4 border-b border-border/50">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <MessageCircleHeart className="h-5 w-5 text-secondary" />
+                與督導對話
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col p-4 overflow-hidden gap-4">
+              <ScrollArea className="flex-1 pr-2">
+                <div className="space-y-4">
+                  {defaultChatHistory.map((message, index) => (
+                    <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm ${
+                          message.role === "user" 
+                            ? "bg-secondary text-secondary-foreground rounded-br-sm" 
+                            : "bg-card border border-border text-foreground rounded-bl-sm"
+                        }`}
+                      >
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+              <div className="pt-2">
+                <Textarea
+                  placeholder="問問督導：如果學生一直沈默怎麼辦..."
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  className="min-h-[80px] resize-none text-sm rounded-xl border-border/60 bg-card mb-2"
+                />
+                <Button className="w-full rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground" onClick={handleChatWithExpert}>
+                  傳送訊息
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
-    </ScrollArea>
+    </div>
   );
 }
