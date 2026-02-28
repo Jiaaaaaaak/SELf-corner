@@ -82,6 +82,17 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
 
       {/* Input bar */}
       <div className="flex items-center gap-3 px-6 py-3 border-t border-[#E5E2D9]">
+        <div className="flex-1 flex items-center h-10 px-4 border border-[#E5E2D9] bg-[#FAF9F6] rounded-sm">
+          <input
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={isRecording ? "聆聽中..." : "輸入文字回應..."}
+            className="flex-1 text-sm bg-transparent outline-none placeholder:text-[#A09C94]"
+            disabled={isPaused || isRecording}
+          />
+        </div>
+
         <button
           onClick={toggleRecording}
           disabled={isPaused}
@@ -95,17 +106,6 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
           {isRecording ? <Disc2 className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
 
-        <div className="flex-1 flex items-center h-10 px-4 border border-[#E5E2D9] bg-[#FAF9F6] rounded-sm">
-          <input
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isRecording ? "聆聽中..." : "輸入文字回應..."}
-            className="flex-1 text-sm bg-transparent outline-none placeholder:text-[#A09C94]"
-            disabled={isPaused || isRecording}
-          />
-        </div>
-
         <button
           onClick={handleSend}
           disabled={!inputText.trim() || isPaused || isRecording}
@@ -114,8 +114,6 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
         >
           <Send className="w-4 h-4" />
         </button>
-
-        <div className="w-px h-6 bg-[#E5E2D9] mx-1" />
 
         <button
           onClick={onTogglePause}

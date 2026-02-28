@@ -1,6 +1,6 @@
-import { useState } from "react";
-import classroomBg from "@/assets/classroom-background.png";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import classroomBg from "@/assets/classroom-background.png";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Dices,
@@ -11,6 +11,7 @@ import {
   MessageCircle,
   Radar,
   CirclePause,
+  CirclePlay,
   LogOut,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -40,6 +41,7 @@ export default function Chatroom() {
   const navigate = useNavigate();
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [studentEmotion, setStudentEmotion] = useState<"neutral" | "angry" | "sad" | "thinking">("neutral");
   const [selectedScenarioId, setSelectedScenarioId] = useState<number | null>(null);
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
@@ -48,6 +50,19 @@ export default function Chatroom() {
   const [displayedScenarios, setDisplayedScenarios] = useState(() =>
     pickRandomScenarios(allScenarios, DISPLAY_COUNT)
   );
+
+  // Live timer
+  useEffect(() => {
+    if (!isStarted || isPaused) return;
+    const interval = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [isStarted, isPaused]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const sec = (s % 60).toString().padStart(2, "0");
+    return `${m}:${sec}`;
+  };
 
   const selectedScenario = allScenarios.find((s) => s.id === selectedScenarioId) || null;
 
@@ -107,7 +122,7 @@ export default function Chatroom() {
           <span className="text-sm font-semibold">
             {selectedScenario?.title || "隨機情境挑戰"}
           </span>
-          <span className="font-heading text-xl font-bold">00:00</span>
+          <span className="font-heading text-xl font-bold">{formatTime(elapsedSeconds)}</span>
         </div>
       )}
 
@@ -137,7 +152,7 @@ export default function Chatroom() {
               onClick={() => { handleTogglePause(); onNavigate?.(); }}
               className="flex items-center gap-2 text-[13px] font-heading font-medium text-[#A09C94] hover:text-[#FAF9F6] transition-colors"
             >
-              <CirclePause className="w-5 h-5" />
+              {isPaused ? <CirclePlay className="w-5 h-5" /> : <CirclePause className="w-5 h-5" />}
               {isPaused ? "繼續練習" : "暫停練習"}
             </button>
             <button
