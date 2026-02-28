@@ -278,19 +278,24 @@ export default function Chatroom() {
           {/* Active session */}
           {isStarted && (
             <div className="absolute inset-0 flex flex-col">
-              {/* Student area - takes remaining space above chat */}
-              <div className="flex-1 flex flex-col items-center justify-center">
-                <div className="w-[140px] h-[140px] rounded-full bg-[#F0EDE6] flex items-center justify-center text-6xl shadow-sm">
+              {/* Student info bar - top strip */}
+              <div className="flex items-center gap-3 px-6 py-3 bg-black/30 backdrop-blur-md z-10">
+                <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-sm">
                   {renderStudentAvatar()}
                 </div>
-                <span className="font-heading text-sm font-semibold text-foreground mt-4">小明（國二）</span>
-                <div className="flex items-center gap-1.5 bg-[#E07A5F15] px-2.5 py-1 rounded-sm mt-2">
-                  <div className="w-2 h-2 rounded-sm bg-primary" />
-                  <span className="font-heading text-[11px] font-semibold tracking-wide text-primary">
-                    {emotionLabel()}
-                  </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-white drop-shadow-sm">小明（國二）</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    <span className="text-[11px] font-medium text-white/80">
+                      {emotionLabel()}
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Spacer - classroom background visible */}
+              <div className="flex-1" />
 
               {/* Chat Panel - bottom portion */}
               <ChatPanel
