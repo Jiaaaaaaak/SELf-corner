@@ -261,14 +261,14 @@ export default function Chatroom() {
 
           {/* Active session */}
           {isStarted && (
-            <>
-              {/* Center student avatar */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] flex flex-col items-center gap-4 z-0">
-                <div className="w-[120px] h-[120px] rounded-full bg-[#F0EDE6] flex items-center justify-center text-5xl">
+            <div className="absolute inset-0 flex flex-col">
+              {/* Student area - takes remaining space above chat */}
+              <div className="flex-1 flex flex-col items-center justify-center">
+                <div className="w-[140px] h-[140px] rounded-full bg-[#F0EDE6] flex items-center justify-center text-6xl shadow-sm">
                   {renderStudentAvatar()}
                 </div>
-                <span className="font-heading text-sm font-semibold text-foreground">小明（國二）</span>
-                <div className="flex items-center gap-1.5 bg-[#E07A5F15] px-2.5 py-1 rounded-sm">
+                <span className="font-heading text-sm font-semibold text-foreground mt-4">小明（國二）</span>
+                <div className="flex items-center gap-1.5 bg-[#E07A5F15] px-2.5 py-1 rounded-sm mt-2">
                   <div className="w-2 h-2 rounded-sm bg-primary" />
                   <span className="font-heading text-[11px] font-semibold tracking-wide text-primary">
                     {emotionLabel()}
@@ -276,14 +276,14 @@ export default function Chatroom() {
                 </div>
               </div>
 
-              {/* Chat Panel */}
+              {/* Chat Panel - bottom portion */}
               <ChatPanel
                 isPaused={isPaused}
                 onTogglePause={handleTogglePause}
                 onEnd={handleEnd}
                 onEmotionChange={(emo) => setStudentEmotion(emo as any)}
               />
-            </>
+            </div>
           )}
         </div>
       </main>

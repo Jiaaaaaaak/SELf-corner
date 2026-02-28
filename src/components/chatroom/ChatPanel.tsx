@@ -54,7 +54,7 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 flex flex-col bg-white border-t border-[#E5E2D9]">
+    <div className="flex flex-col bg-white/90 backdrop-blur-sm border-t border-[#E5E2D9] shrink-0">
       {/* Chat messages */}
       <ScrollArea className="h-[200px] px-6 py-4">
         <div className="space-y-3 pb-2">
