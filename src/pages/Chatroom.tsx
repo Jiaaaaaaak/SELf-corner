@@ -4,18 +4,14 @@ import AppLayout from "@/components/AppLayout";
 import classroomBg from "@/assets/classroom-background.png";
 import {
   Dices,
-  RefreshCw,
   HelpCircle,
   AlertCircle,
   Play,
   RotateCcw,
-  Clock,
 } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
-  DialogHeader, 
-  DialogTitle 
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import ScenarioCard from "@/components/chatroom/ScenarioCard";
@@ -44,7 +40,6 @@ export default function Chatroom() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // States
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -125,44 +120,58 @@ export default function Chatroom() {
     switch (studentEmotion) {
       case "angry": return "抗拒 · 防衛";
       case "sad": return "難過 · 退縮";
-      case "thinking": return "思考中...";
+      case "thinking": return "學生思考中...";
       default: return "聆聽中";
     }
   };
 
+  // Pass session info to sidebar via AppLayout
+  const sessionInfo = isStarted && activeScenario ? {
+    scenarioTitle: activeScenario.title,
+    formattedTime: formatTime(elapsedSeconds),
+    isPaused,
+    onTogglePause: handleTogglePause,
+    onEnd: handleEnd,
+  } : undefined;
+
   return (
-    <AppLayout>
+    <AppLayout sessionInfo={sessionInfo}>
       <div className="flex flex-col h-full overflow-hidden relative">
         {/* Top Header Toolbar */}
-        <header className="h-16 bg-white border-b border-[#E5E2D9] flex items-center justify-between px-8 shrink-0 z-20">
+        <header className="h-14 bg-white/95 backdrop-blur-sm border-b border-[#E5E2D9] flex items-center justify-between px-6 shrink-0 z-20">
           <div className="flex items-center gap-4 pl-12 lg:pl-0">
-             <Badge variant="outline" className="font-heading text-[10px] font-bold tracking-widest uppercase border-primary/30 text-primary">
-               {isStarted ? "Active Practice" : "Scenario Selection"}
-             </Badge>
-             <h2 className="text-sm font-bold text-[#3D3831] truncate max-w-[200px] md:max-w-none">
-               {isStarted ? activeScenario?.title : "探索練習情境"}
-             </h2>
+             {isStarted ? (
+               <h2 className="text-sm font-bold text-[#3D3831]">
+                 情境：{activeScenario?.title}
+               </h2>
+             ) : (
+               <>
+                 <Badge variant="outline" className="font-heading text-[10px] font-bold tracking-widest uppercase border-primary/30 text-primary">
+                   Scenario Selection
+                 </Badge>
+                 <h2 className="text-sm font-bold text-[#3D3831] truncate max-w-[200px] md:max-w-none">
+                   探索練習情境
+                 </h2>
+               </>
+             )}
           </div>
           
-          <div className="flex items-center gap-6">
-             {/* Timer Display */}
+          <div className="flex items-center gap-4">
+             {/* Emotion status indicator */}
              {isStarted && (
-               <div className="flex items-center gap-3 px-4 py-1.5 bg-[#FAF9F6] border border-[#E5E2D9] rounded-full shadow-inner">
-                 <div className={`w-2 h-2 rounded-full ${isPaused ? "bg-[#A09C94]" : "bg-primary animate-pulse"}`} />
-                 <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-[#706C61]" />
-                    <span className="font-heading text-sm font-bold text-[#3D3831] tabular-nums tracking-wider">
-                       {formatTime(elapsedSeconds)}
-                    </span>
-                 </div>
+               <div className="flex items-center gap-2">
+                 <div className={`w-2 h-2 rounded-full ${isPaused ? "bg-[#A09C94]" : "bg-green-500 animate-pulse"}`} />
+                 <span className="text-sm font-medium text-[#706C61]">
+                   {emotionLabel()}
+                 </span>
                </div>
              )}
 
              <button
                onClick={() => setHelpOpen(true)}
-               className="w-10 h-10 border border-[#E5E2D9] flex items-center justify-center rounded-lg hover:bg-[#FAF9F6] transition-all group"
+               className="w-9 h-9 border border-[#E5E2D9] flex items-center justify-center rounded-lg hover:bg-[#FAF9F6] transition-all group"
              >
-               <HelpCircle className="w-5 h-5 text-[#A09C94] group-hover:text-primary transition-colors" />
+               <HelpCircle className="w-4.5 h-4.5 text-[#A09C94] group-hover:text-primary transition-colors" />
              </button>
           </div>
         </header>
@@ -175,14 +184,34 @@ export default function Chatroom() {
               className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000" 
               style={{ backgroundImage: `url(${classroomBg})` }}
             >
-              <div className="absolute inset-0 bg-[#FAF9F6]/20 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-[#FAF9F6]/10" />
+            </div>
+          )}
+
+          {/* Student avatar overlay - top left area */}
+          {isStarted && (
+            <div className="absolute top-6 left-8 z-20 flex items-center gap-4 animate-in fade-in duration-500">
+              <div className="w-14 h-14 rounded-full bg-white/90 backdrop-blur-sm border-2 border-white shadow-xl flex items-center justify-center text-3xl">
+                {renderStudentAvatar()}
+              </div>
+              <div className="flex flex-col">
+                <span className="font-heading text-base font-bold text-white drop-shadow-md">
+                  小明（國二）
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${isPaused ? "bg-[#A09C94]" : "bg-primary animate-pulse"}`} />
+                  <span className="text-xs font-medium text-white/80 drop-shadow-sm">
+                    {emotionLabel()}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
           {/* PAUSE OVERLAY */}
           {isStarted && isPaused && (
-            <div className="absolute inset-0 z-40 bg-[#FAF9F6]/40 backdrop-blur(8px) flex items-center justify-center animate-in fade-in duration-300">
-              <div className="bg-white/90 border border-[#E5E2D9] p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center backdrop-blur-md">
+            <div className="absolute inset-0 z-40 bg-black/40 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300">
+              <div className="bg-white/95 backdrop-blur-md border border-[#E5E2D9] p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center">
                 <div className="w-16 h-16 bg-[#FAF9F6] rounded-full flex items-center justify-center">
                    <AlertCircle className="w-8 h-8 text-[#A09C94]" />
                 </div>
@@ -274,37 +303,14 @@ export default function Chatroom() {
             <RandomConfirm onClose={handleCloseDetail} onStart={() => handleStart()} />
           )}
 
-          {/* 3. ACTIVE SESSION VIEW */}
+          {/* 3. ACTIVE SESSION VIEW - just ChatPanel over background */}
           {isStarted && (
-            <div className="h-full flex flex-col animate-in fade-in zoom-in-95 duration-500 relative z-10">
-               {/* Center student visualization */}
-               <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-48">
-                  <div className="relative group">
-                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-                     <div className="w-[140px] h-[140px] rounded-full bg-white/90 border-4 border-white shadow-2xl flex items-center justify-center text-6xl relative z-10 transition-transform hover:scale-105 duration-500">
-                        {renderStudentAvatar()}
-                     </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-3 relative z-10">
-                     <h3 className="font-heading text-lg font-bold text-[#3D3831] drop-shadow-sm">
-                        林小明 (國二)
-                     </h3>
-                     <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/20 shadow-sm">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="font-heading text-[11px] font-bold tracking-widest text-primary uppercase">
-                           {emotionLabel()}
-                        </span>
-                     </div>
-                  </div>
-               </div>
-
-               <ChatPanel
-                 isPaused={isPaused}
-                 onTogglePause={handleTogglePause}
-                 onEnd={handleEnd}
-                 onEmotionChange={(emo) => setStudentEmotion(emo as any)}
-               />
-            </div>
+            <ChatPanel
+              isPaused={isPaused}
+              onTogglePause={handleTogglePause}
+              onEnd={handleEnd}
+              onEmotionChange={(emo) => setStudentEmotion(emo as any)}
+            />
           )}
         </div>
       </div>

@@ -1,27 +1,33 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Sidebar from "./Sidebar";
 
 interface AppLayoutProps {
   children: React.ReactNode;
+  sessionInfo?: {
+    scenarioTitle: string;
+    formattedTime: string;
+    isPaused: boolean;
+    onTogglePause: () => void;
+    onEnd: () => void;
+  };
 }
 
-export default function AppLayout({ children }: AppLayoutProps) {
+export default function AppLayout({ children, sessionInfo }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
-  // Ensure drawer is closed on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#FAF9F6]">
-      {/* Desktop sidebar - Fixed width */}
+      {/* Desktop sidebar */}
       <aside className="hidden lg:block shrink-0 h-full border-r border-black/5">
-        <Sidebar />
+        <Sidebar sessionInfo={sessionInfo} />
       </aside>
 
       {/* Mobile drawer */}
@@ -34,19 +40,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </SheetTrigger>
         </div>
         <SheetContent side="left" className="p-0 w-[260px] bg-[#1E1D1B] border-none">
-          <Sidebar onNavigate={() => setMobileOpen(false)} />
+          <Sidebar onNavigate={() => setMobileOpen(false)} sessionInfo={sessionInfo} />
         </SheetContent>
       </Sheet>
 
       {/* Main content area */}
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto relative scroll-smooth bg-[#FAF9F6]">
-        {/* Persistent background decoration */}
         <div className="absolute inset-0 chalk-dots pointer-events-none opacity-[0.03]" />
-        
-        {/* 
-          This wrapper ensures that even if children has height issues, 
-          the layout won't collapse during navigation transitions.
-        */}
         <div className="relative flex-1 flex flex-col min-h-full">
           {children}
         </div>
