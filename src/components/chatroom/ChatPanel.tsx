@@ -60,25 +60,25 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
   };
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 flex flex-col bg-white/80 backdrop-blur-md border-t border-[#E5E2D9] z-30">
-      {/* Chat messages area */}
-      <ScrollArea className="h-[240px] px-8 py-6">
-        <div className="flex flex-col gap-4 pb-4">
+    <div className="absolute bottom-0 left-0 right-0 flex flex-col bg-transparent z-30">
+      {/* Chat messages area - Fully Transparent with better shadowing for readability */}
+      <ScrollArea className="h-[280px] px-8 py-6">
+        <div className="flex flex-col gap-5 pb-4">
           {messages.map((msg, i) => (
             <div 
               key={i} 
               className={`flex ${msg.role === "teacher" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
             >
               {msg.role === "student" && (
-                <div className="w-8 h-8 rounded-full bg-[#F0EDE6] border border-[#E5E2D9] flex items-center justify-center shrink-0 mr-3 self-end shadow-sm">
-                  <span className="text-[10px] font-bold text-[#706C61]">小明</span>
+                <div className="w-9 h-9 rounded-full bg-white/90 border border-[#E5E2D9] flex items-center justify-center shrink-0 mr-3 self-end shadow-md">
+                  <span className="text-[11px] font-bold text-[#706C61]">小明</span>
                 </div>
               )}
               <div
-                className={`max-w-[75%] px-4 py-3 text-sm font-medium leading-relaxed shadow-sm ${
+                className={`max-w-[70%] px-5 py-3.5 text-[15px] font-medium leading-relaxed shadow-xl border backdrop-blur-sm ${
                   msg.role === "teacher"
-                    ? "bg-primary text-white rounded-[18px] rounded-tr-none shadow-primary/10"
-                    : "bg-white border border-[#E5E2D9] text-[#3D3831] rounded-[18px] rounded-tl-none"
+                    ? "bg-primary text-white rounded-[22px] rounded-tr-none border-primary/20"
+                    : "bg-white/90 text-[#3D3831] rounded-[22px] rounded-tl-none border-[#E5E2D9]"
                 }`}
               >
                 <p>{msg.content}</p>
@@ -87,14 +87,14 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
           ))}
           {isThinking && (
             <div className="flex justify-start animate-in fade-in duration-300">
-               <div className="w-8 h-8 rounded-full bg-[#F0EDE6] border border-[#E5E2D9] flex items-center justify-center shrink-0 mr-3 self-end">
-                  <Loader2 className="w-3 h-3 text-[#706C61] animate-spin" />
+               <div className="w-9 h-9 rounded-full bg-white/90 border border-[#E5E2D9] flex items-center justify-center shrink-0 mr-3 self-end shadow-md">
+                  <Loader2 className="w-4 h-4 text-[#706C61] animate-spin" />
                </div>
-               <div className="bg-[#FAF9F6] border border-[#E5E2D9] px-4 py-3 rounded-[18px] rounded-tl-none">
-                  <div className="flex gap-1">
-                     <div className="w-1.5 h-1.5 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                     <div className="w-1.5 h-1.5 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                     <div className="w-1.5 h-1.5 bg-[#A09C94] rounded-full animate-bounce" />
+               <div className="bg-white/80 backdrop-blur-sm border border-[#E5E2D9] px-5 py-3.5 rounded-[22px] rounded-tl-none shadow-lg">
+                  <div className="flex gap-1.5">
+                     <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                     <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                     <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce" />
                   </div>
                </div>
             </div>
@@ -103,57 +103,55 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
         </div>
       </ScrollArea>
 
-      {/* Control bar */}
-      <div className="px-8 py-4 border-t border-[#E5E2D9] bg-white">
+      {/* Control bar - Glassmorphism style */}
+      <div className="px-8 py-6 bg-gradient-to-t from-black/20 to-transparent">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <button
             onClick={toggleRecording}
             disabled={isPaused}
-            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all active:scale-95 ${
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-2xl transition-all active:scale-95 border-2 ${
               isRecording
-                ? "bg-destructive text-white ring-4 ring-destructive/20 animate-pulse"
-                : "bg-white border border-[#E5E2D9] text-[#3D3831] hover:border-primary hover:text-primary"
+                ? "bg-destructive text-white border-destructive/50 ring-4 ring-destructive/20 animate-pulse"
+                : "bg-white/90 backdrop-blur-md border-white/50 text-[#3D3831] hover:text-primary hover:scale-105"
             } disabled:opacity-50`}
           >
-            {isRecording ? <Disc2 className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            {isRecording ? <Disc2 className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
           </button>
 
-          <div className="flex-1 flex items-center h-12 px-5 bg-[#FAF9F6] border border-[#E5E2D9] rounded-xl focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary focus-within:bg-white transition-all group">
+          <div className="flex-1 flex items-center h-14 px-6 bg-white/90 backdrop-blur-md border-2 border-white/50 rounded-2xl shadow-2xl focus-within:ring-4 focus-within:ring-primary/20 focus-within:border-primary transition-all group">
             <input
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isRecording ? "正在聆聽您的聲音..." : "在此輸入您的回應內容..."}
-              className="flex-1 text-[15px] bg-transparent outline-none placeholder:text-[#A09C94] text-[#3D3831] font-medium"
+              placeholder={isRecording ? "正在聆聽您的聲音..." : "在這裡輸入您的回應..."}
+              className="flex-1 text-[16px] bg-transparent outline-none placeholder:text-[#A09C94] text-[#3D3831] font-semibold"
               disabled={isPaused || isRecording}
             />
             {inputText.trim() && (
               <button
                 onClick={handleSend}
-                className="ml-2 text-primary hover:scale-110 transition-transform active:scale-90"
+                className="ml-3 text-primary hover:scale-125 transition-transform active:scale-90"
               >
-                <Send className="w-5 h-5 fill-current" />
+                <Send className="w-6 h-6 fill-current" />
               </button>
             )}
           </div>
 
-          <div className="w-px h-8 bg-[#E5E2D9] mx-1" />
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               onClick={onTogglePause}
-              className="w-12 h-12 rounded-xl flex items-center justify-center border border-[#E5E2D9] bg-white text-[#706C61] hover:bg-[#FAF9F6] hover:text-[#3D3831] transition-all shadow-sm"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/90 backdrop-blur-md border-2 border-white/50 text-[#706C61] hover:text-primary transition-all shadow-2xl hover:scale-105 active:scale-95"
               title={isPaused ? "繼續練習" : "暫停練習"}
             >
-              {isPaused ? <Play className="w-5 h-5 fill-current" /> : <Pause className="w-5 h-5 fill-current" />}
+              {isPaused ? <Play className="w-6 h-6 fill-current" /> : <Pause className="w-6 h-6 fill-current" />}
             </button>
 
             <button
               onClick={onEnd}
-              className="px-5 h-12 rounded-xl flex items-center gap-2 border border-destructive/20 bg-destructive/5 text-destructive font-heading font-bold text-xs tracking-widest hover:bg-destructive hover:text-white transition-all shadow-sm group"
+              className="px-6 h-14 rounded-2xl flex items-center gap-3 bg-destructive text-white font-heading font-bold text-sm tracking-widest hover:bg-[#B54A4A] transition-all shadow-2xl shadow-destructive/20 hover:scale-105 active:scale-95"
             >
-              <SquareSquare className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              結束對話
+              <SquareSquare className="w-5 h-5 fill-current" />
+              結束
             </button>
           </div>
         </div>

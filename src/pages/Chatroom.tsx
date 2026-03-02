@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
+import classroomBg from "@/assets/classroom-background.png";
 import {
   Dices,
   RefreshCw,
@@ -8,6 +9,7 @@ import {
   AlertCircle,
   Play,
   RotateCcw,
+  Clock,
 } from "lucide-react";
 import { 
   Dialog, 
@@ -45,6 +47,7 @@ export default function Chatroom() {
   // States
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [studentEmotion, setStudentEmotion] = useState<"neutral" | "angry" | "sad" | "thinking">("neutral");
   const [selectedScenarioId, setSelectedScenarioId] = useState<number | null>(null);
   const [activeScenario, setActiveScenario] = useState<(typeof allScenarios)[0] | null>(null);
@@ -55,7 +58,18 @@ export default function Chatroom() {
     pickRandomScenarios(allScenarios, DISPLAY_COUNT)
   );
 
-  // Effect to handle Retry logic from Feedback page
+  // Timer Effect
+  useEffect(() => {
+    let interval: any;
+    if (isStarted && !isPaused) {
+      interval = setInterval(() => {
+        setElapsedSeconds((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isStarted, isPaused]);
+
+  // Handle Retry logic
   useEffect(() => {
     const retryId = location.state?.retryScenarioId;
     if (retryId) {
@@ -63,11 +77,17 @@ export default function Chatroom() {
       if (scenario) {
         setActiveScenario(scenario);
         setIsStarted(true);
-        // Clear state to prevent loop on refresh
+        setElapsedSeconds(0);
         window.history.replaceState({}, document.title);
       }
     }
   }, [location.state]);
+
+  const formatTime = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
 
   const handleCardClick = (id: number) => setSelectedScenarioId(id);
   const handleRandomClick = () => setShowRandomConfirm(true);
@@ -78,6 +98,7 @@ export default function Chatroom() {
     setActiveScenario(chosen);
     setIsStarted(true);
     setIsPaused(false);
+    setElapsedSeconds(0);
     setSelectedScenarioId(null);
     setShowRandomConfirm(false);
   };
@@ -88,11 +109,7 @@ export default function Chatroom() {
   };
 
   const handleTogglePause = () => setIsPaused(!isPaused);
-  
-  // When ending, pass the current scenario ID to Feedback page
-  const handleEnd = () => {
-    navigate("/feedback", { state: { currentScenarioId: activeScenario?.id } });
-  };
+  const handleEnd = () => navigate("/feedback", { state: { currentScenarioId: activeScenario?.id } });
 
   const renderStudentAvatar = () => {
     if (isPaused) return "⏸️";
@@ -115,7 +132,7 @@ export default function Chatroom() {
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex flex-col h-full overflow-hidden relative">
         {/* Top Header Toolbar */}
         <header className="h-16 bg-white border-b border-[#E5E2D9] flex items-center justify-between px-8 shrink-0 z-20">
           <div className="flex items-center gap-4 pl-12 lg:pl-0">
@@ -126,13 +143,21 @@ export default function Chatroom() {
                {isStarted ? activeScenario?.title : "探索練習情境"}
              </h2>
           </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex items-center gap-6">
+             {/* Timer Display */}
              {isStarted && (
-               <div className="hidden md:flex items-center gap-2 mr-4 text-[11px] font-bold text-[#706C61] uppercase tracking-wider">
-                 <div className={`w-2 h-2 rounded-full ${isPaused ? "bg-muted-foreground" : "bg-secondary animate-pulse"}`} />
-                 <span>Session Live</span>
+               <div className="flex items-center gap-3 px-4 py-1.5 bg-[#FAF9F6] border border-[#E5E2D9] rounded-full shadow-inner">
+                 <div className={`w-2 h-2 rounded-full ${isPaused ? "bg-[#A09C94]" : "bg-primary animate-pulse"}`} />
+                 <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-[#706C61]" />
+                    <span className="font-heading text-sm font-bold text-[#3D3831] tabular-nums tracking-wider">
+                       {formatTime(elapsedSeconds)}
+                    </span>
+                 </div>
                </div>
              )}
+
              <button
                onClick={() => setHelpOpen(true)}
                className="w-10 h-10 border border-[#E5E2D9] flex items-center justify-center rounded-lg hover:bg-[#FAF9F6] transition-all group"
@@ -144,10 +169,20 @@ export default function Chatroom() {
 
         {/* Content View Area */}
         <div className="flex-1 relative overflow-hidden">
+          {/* BACKGROUND IMAGE */}
+          {isStarted && (
+            <div 
+              className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000" 
+              style={{ backgroundImage: `url(${classroomBg})` }}
+            >
+              <div className="absolute inset-0 bg-[#FAF9F6]/20 backdrop-blur-[1px]" />
+            </div>
+          )}
+
           {/* PAUSE OVERLAY */}
           {isStarted && isPaused && (
-            <div className="absolute inset-0 z-40 bg-background/30 backdrop-blur(8px) flex items-center justify-center animate-in fade-in duration-300">
-              <div className="bg-white border border-[#E5E2D9] p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center">
+            <div className="absolute inset-0 z-40 bg-[#FAF9F6]/40 backdrop-blur(8px) flex items-center justify-center animate-in fade-in duration-300">
+              <div className="bg-white/90 border border-[#E5E2D9] p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center backdrop-blur-md">
                 <div className="w-16 h-16 bg-[#FAF9F6] rounded-full flex items-center justify-center">
                    <AlertCircle className="w-8 h-8 text-[#A09C94]" />
                 </div>
@@ -170,7 +205,7 @@ export default function Chatroom() {
 
           {/* 1. SCENARIO SELECTION VIEW */}
           {!isStarted && !selectedScenarioId && !showRandomConfirm && (
-            <div className="h-full overflow-y-auto px-6 py-10 md:px-12 animate-in fade-in duration-500">
+            <div className="h-full overflow-y-auto px-6 py-10 md:px-12 animate-in fade-in duration-500 bg-[#FAF9F6]">
                <div className="max-w-5xl mx-auto flex flex-col gap-10">
                  <div className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
@@ -241,19 +276,20 @@ export default function Chatroom() {
 
           {/* 3. ACTIVE SESSION VIEW */}
           {isStarted && (
-            <div className="h-full flex flex-col animate-in fade-in zoom-in-95 duration-500">
+            <div className="h-full flex flex-col animate-in fade-in zoom-in-95 duration-500 relative z-10">
+               {/* Center student visualization */}
                <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-48">
                   <div className="relative group">
-                     <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl animate-pulse" />
-                     <div className="w-[140px] h-[140px] rounded-full bg-[#F0EDE6] border-4 border-white shadow-xl flex items-center justify-center text-6xl relative z-10 transition-transform hover:scale-105 duration-500">
+                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+                     <div className="w-[140px] h-[140px] rounded-full bg-white/90 border-4 border-white shadow-2xl flex items-center justify-center text-6xl relative z-10 transition-transform hover:scale-105 duration-500">
                         {renderStudentAvatar()}
                      </div>
                   </div>
                   <div className="flex flex-col items-center gap-3 relative z-10">
-                     <h3 className="font-heading text-lg font-bold text-[#3D3831]">
+                     <h3 className="font-heading text-lg font-bold text-[#3D3831] drop-shadow-sm">
                         林小明 (國二)
                      </h3>
-                     <div className="flex items-center gap-2 bg-[#E07A5F15] px-4 py-1.5 rounded-full border border-primary/20">
+                     <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/20 shadow-sm">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                         <span className="font-heading text-[11px] font-bold tracking-widest text-primary uppercase">
                            {emotionLabel()}
