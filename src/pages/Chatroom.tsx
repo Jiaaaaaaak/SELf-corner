@@ -8,6 +8,7 @@ import {
   AlertCircle,
   Play,
   RotateCcw,
+  Mic,
 } from "lucide-react";
 import { 
   Dialog, 
@@ -49,6 +50,7 @@ export default function Chatroom() {
   const [activeTag, setActiveTag] = useState("全部");
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [voicePromptOpen, setVoicePromptOpen] = useState(false);
   const [displayedScenarios, setDisplayedScenarios] = useState(() =>
     pickRandomScenarios(allScenarios, DISPLAY_COUNT)
   );
@@ -91,11 +93,18 @@ export default function Chatroom() {
   const handleStart = (scenario?: (typeof allScenarios)[0]) => {
     const chosen = scenario || allScenarios.find(s => s.id === selectedScenarioId) || pickRandomScenarios(allScenarios, 1)[0];
     setActiveScenario(chosen);
+    setSelectedScenarioId(null);
+    setShowRandomConfirm(false);
+    // Show voice prompt before starting
+    setVoicePromptOpen(true);
+  };
+
+  const handleVoiceConfirm = (enableVoice: boolean) => {
+    setVoicePromptOpen(false);
     setIsStarted(true);
     setIsPaused(false);
     setElapsedSeconds(0);
-    setSelectedScenarioId(null);
-    setShowRandomConfirm(false);
+    // TODO: pass enableVoice to ChatPanel when voice is implemented
   };
 
   const handleCloseDetail = () => {
@@ -314,6 +323,38 @@ export default function Chatroom() {
           )}
         </div>
       </div>
+
+      {/* Voice Prompt Dialog */}
+      <Dialog open={voicePromptOpen} onOpenChange={setVoicePromptOpen}>
+        <DialogContent className="sm:max-w-sm border-none p-0 overflow-hidden rounded-2xl shadow-2xl">
+          <div className="p-8 flex flex-col items-center gap-6 text-center">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Mic className="w-8 h-8 text-primary" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-heading text-xl font-bold text-[#3D3831]">開啟語音功能？</h3>
+              <p className="text-sm text-[#706C61] font-medium leading-relaxed">
+                語音模式可讓您用口說方式與 AI 學生互動，體驗更真實的對話練習。
+              </p>
+            </div>
+            <div className="flex gap-3 w-full">
+              <button
+                onClick={() => handleVoiceConfirm(false)}
+                className="flex-1 h-11 border-2 border-[#E5E2D9] rounded-xl font-heading text-sm font-bold text-[#706C61] hover:bg-[#FAF9F6] transition-all"
+              >
+                僅用文字
+              </button>
+              <button
+                onClick={() => handleVoiceConfirm(true)}
+                className="flex-1 h-11 bg-primary text-white rounded-xl font-heading text-sm font-bold shadow-lg hover:bg-[#C8694F] transition-all flex items-center justify-center gap-2"
+              >
+                <Mic className="w-4 h-4" />
+                開啟語音
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Help Dialog */}
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>

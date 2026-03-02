@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   Radar as RechartRadar, 
   RadarChart, 
@@ -16,7 +15,7 @@ import {
   YAxis,
   CartesianGrid
 } from "recharts";
-import { ArrowRight, Lightbulb, Sparkles, RefreshCw, Share2, MessageSquare, MessageCircle, Activity } from "lucide-react";
+import { ArrowRight, Lightbulb, Sparkles, RefreshCw, Share2, MessageSquare, MessageCircle, Activity, PlusCircle } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
 import { Badge } from "@/components/ui/badge";
 
@@ -108,6 +107,13 @@ export default function Feedback() {
             >
               <RefreshCw className="w-4 h-4" />
               重試一次
+            </button>
+            <button
+              onClick={() => navigate("/chatroom")}
+              className="h-11 px-6 border-2 border-primary/30 rounded-xl font-heading text-sm font-bold text-primary hover:bg-primary/5 transition-all flex items-center gap-2"
+            >
+              <PlusCircle className="w-4 h-4" />
+              練新情境
             </button>
             <button className="h-11 px-6 bg-primary text-white rounded-xl font-heading text-sm font-bold shadow-lg shadow-primary/20 hover:bg-[#C8694F] transition-all flex items-center gap-2">
               <Share2 className="w-4 h-4" />
@@ -227,70 +233,38 @@ export default function Feedback() {
           <div className="flex-1 flex flex-col gap-8 min-w-0">
             {/* Transcript Card */}
             <div className="bg-white border border-[#E5E2D9] rounded-2xl shadow-sm flex flex-col flex-1 min-h-[500px] overflow-hidden">
-              <div className="flex items-center justify-between px-8 py-5 border-b border-[#E5E2D9] bg-[#FAF9F6]/50">
+              <div className="flex items-center px-8 py-5 border-b border-[#E5E2D9] bg-[#FAF9F6]/50">
                 <div className="flex items-center gap-3">
                    <MessageCircle className="w-5 h-5 text-primary" />
                    <h2 className="font-heading text-lg font-bold text-[#3D3831]">對話逐字稿回顧</h2>
                 </div>
-                <Tabs defaultValue="combined" className="w-[180px]">
-                  <TabsList className="grid w-full grid-cols-2 h-9 rounded-lg bg-[#E5E2D9]/30 p-1">
-                    <TabsTrigger value="combined" className="text-xs font-bold rounded-md">完整視圖</TabsTrigger>
-                    <TabsTrigger value="separate" className="text-xs font-bold rounded-md">雙員對照</TabsTrigger>
-                  </TabsList>
-                </Tabs>
               </div>
               
               <ScrollArea className="flex-1 px-8 py-8">
-                <Tabs defaultValue="combined" className="w-full">
-                  <TabsContent value="combined" className="m-0 space-y-6">
-                    {defaultTranscript.map((entry, index) => (
-                      <div key={index} className={`flex flex-col ${entry.role === "teacher" ? "items-end" : "items-start"} animate-in fade-in slide-in-from-bottom-2 duration-500`} style={{ animationDelay: `${index * 50}ms` }}>
-                        <div
-                          className={`max-w-[80%] px-5 py-4 shadow-sm border ${
-                            entry.role === "teacher"
-                              ? "bg-primary text-white border-primary/10 rounded-[20px] rounded-tr-none"
-                              : "bg-white border-[#E5E2D9] text-[#3D3831] rounded-[20px] rounded-tl-none font-medium"
-                          } ${entry.highlight ? 'ring-4 ring-accent/20 border-accent/50' : ''}`}
-                        >
-                          <span className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2 block opacity-60">
-                            {entry.role === "teacher" ? "Teacher Mode" : "Student Input"}
-                          </span>
-                          <p className="text-[15px] leading-relaxed">{entry.content}</p>
-                        </div>
-                        {entry.highlight && entry.note && (
-                          <div className="mt-3 max-w-[80%] bg-accent/10 text-[#B8A06A] text-[12px] px-4 py-2.5 font-bold rounded-xl border border-accent/20 flex items-start gap-3 shadow-sm">
-                            <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
-                            <p className="leading-relaxed">{entry.note}</p>
-                          </div>
-                        )}
+                <div className="space-y-6">
+                  {defaultTranscript.map((entry, index) => (
+                    <div key={index} className={`flex flex-col ${entry.role === "teacher" ? "items-end" : "items-start"} animate-in fade-in slide-in-from-bottom-2 duration-500`} style={{ animationDelay: `${index * 50}ms` }}>
+                      <div
+                        className={`max-w-[80%] px-5 py-4 shadow-sm border ${
+                          entry.role === "teacher"
+                            ? "bg-primary text-white border-primary/10 rounded-[20px] rounded-tr-none"
+                            : "bg-white border-[#E5E2D9] text-[#3D3831] rounded-[20px] rounded-tl-none font-medium"
+                        } ${entry.highlight ? 'ring-4 ring-accent/20 border-accent/50' : ''}`}
+                      >
+                        <span className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2 block opacity-60">
+                          {entry.role === "teacher" ? "Teacher Mode" : "Student Input"}
+                        </span>
+                        <p className="text-[15px] leading-relaxed">{entry.content}</p>
                       </div>
-                    ))}
-                  </TabsContent>
-                  <TabsContent value="separate" className="m-0 space-y-6">
-                     <div className="grid grid-cols-2 gap-8 sticky top-0 bg-white/90 backdrop-blur-sm z-20 pb-4 border-b border-[#E5E2D9]/50">
-                        <span className="font-heading text-xs font-bold text-center text-primary uppercase tracking-widest">Teacher Transcript</span>
-                        <span className="font-heading text-xs font-bold text-center text-[#706C61] uppercase tracking-widest">Student Transcript</span>
-                     </div>
-                     {Array.from({ length: Math.max(teacherTranscript.length, studentTranscript.length) }).map((_, idx) => (
-                        <div key={idx} className="grid grid-cols-2 gap-8 items-start">
-                           <div className="flex justify-end">
-                              {teacherTranscript[idx] && (
-                                 <div className="bg-primary text-white p-4 rounded-[18px] rounded-tr-none text-sm font-medium shadow-sm w-full">
-                                    {teacherTranscript[idx].content}
-                                 </div>
-                              )}
-                           </div>
-                           <div className="flex justify-start">
-                              {studentTranscript[idx] && (
-                                 <div className="bg-[#FAF9F6] border border-[#E5E2D9] text-[#3D3831] p-4 rounded-[18px] rounded-tl-none text-sm font-medium shadow-sm w-full">
-                                    {studentTranscript[idx].content}
-                                 </div>
-                              )}
-                           </div>
+                      {entry.highlight && entry.note && (
+                        <div className="mt-3 max-w-[80%] bg-accent/10 text-[#B8A06A] text-[12px] px-4 py-2.5 font-bold rounded-xl border border-accent/20 flex items-start gap-3 shadow-sm">
+                          <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
+                          <p className="leading-relaxed">{entry.note}</p>
                         </div>
-                     ))}
-                  </TabsContent>
-                </Tabs>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </ScrollArea>
             </div>
 
