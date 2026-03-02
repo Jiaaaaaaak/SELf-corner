@@ -37,13 +37,13 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 60 20% 98%;
-    --sidebar-foreground: 30 10% 22%;
+    --sidebar-background: 30 5% 11%; /* #1E1D1B Dark Espresso */
+    --sidebar-foreground: 45 15% 90%;
     --sidebar-primary: 12 69% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 30% 94%;
-    --sidebar-accent-foreground: 30 10% 22%;
-    --sidebar-border: 40 20% 88%;
+    --sidebar-accent: 30 10% 20%;
+    --sidebar-accent-foreground: 45 15% 95%;
+    --sidebar-border: 30 5% 15%;
     --sidebar-ring: 12 69% 63%;
 
     /* Radar Chart Colors */
@@ -99,6 +99,14 @@
     @apply border-border;
   }
 
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #FAF9F6; /* Fallback for HSL variables */
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
@@ -108,5 +116,17 @@
 @layer utilities {
   .font-heading {
     font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .chalk-dots {
+    background-image: radial-gradient(#E07A5F 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.08;
+  }
+
+  .chalk-lines {
+    background-image: linear-gradient(45deg, #E5E2D9 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.05;
   }
 }

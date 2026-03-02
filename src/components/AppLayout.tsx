@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Menu } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Sidebar from "./Sidebar";
 
@@ -9,19 +10,25 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+
+  // Ensure drawer is closed on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:block shrink-0">
+    <div className="flex h-screen w-full overflow-hidden bg-[#FAF9F6]">
+      {/* Desktop sidebar - Fixed width */}
+      <aside className="hidden lg:block shrink-0 h-full border-r border-black/5">
         <Sidebar />
       </aside>
 
-      {/* Mobile hamburger + sheet */}
+      {/* Mobile drawer */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <div className="md:hidden fixed top-0 left-0 z-40 p-3">
+        <div className="lg:hidden fixed top-6 left-6 z-40">
           <SheetTrigger asChild>
-            <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#1E1D1B] text-white shadow-md">
+            <button className="w-11 h-11 flex items-center justify-center rounded-xl bg-[#1E1D1B] text-white shadow-lg hover:bg-[#3D3831] transition-all">
               <Menu className="w-5 h-5" />
             </button>
           </SheetTrigger>
@@ -31,9 +38,18 @@ export default function AppLayout({ children }: AppLayoutProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        {children}
+      {/* Main content area */}
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto relative scroll-smooth bg-[#FAF9F6]">
+        {/* Persistent background decoration */}
+        <div className="absolute inset-0 chalk-dots pointer-events-none opacity-[0.03]" />
+        
+        {/* 
+          This wrapper ensures that even if children has height issues, 
+          the layout won't collapse during navigation transitions.
+        */}
+        <div className="relative flex-1 flex flex-col min-h-full">
+          {children}
+        </div>
       </main>
     </div>
   );

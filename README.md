@@ -1,35 +1,38 @@
-# 🏫 SELf-corner 虛擬教室前端專案
+# 🏫 SELf-corner: AI 虛擬教師培訓平台
 
-歡迎來到我們的虛擬教室 (Virtual Classroom) 專案！本專案的前端主要是透過 [Lovable AI](https://lovable.dev/) 輔助開發，並結合 n8n 等自動化技術來打造的全新平台。
+一個透過 AI 模擬學生對話，幫助教師練習溝通技巧的專業培訓平台。
 
-為了維持專案架構的穩定與 AI 協作的順暢，**目前由特定負責人統一操作 Lovable 進行主體架構的生成與版本同步**。其他團隊成員請透過標準的 Git 流程，直接在地端進行開發、測試與 Code Review。
+## 🚀 專案簡介
+本平台結合了 **OpenAI Realtime API** 與 **LiveKit** 技術，提供低延遲、高擬真的語音與文字互動體驗。教師能在零風險的環境中演練處理學生情緒、衝突管理等情境，並在結束後獲得基於 **SEL (社會情緒學習)** 與 **KIST 對話卡** 框架的深度回饋。
 
-## 💻 專案使用的技術棧
+## 🛠️ 技術棧
+- **Frontend**: React 18 (TypeScript) + Vite + shadcn/ui + Tailwind CSS
+- **State Management**: Zustand + TanStack Query
+- **Real-time**: LiveKit (WebRTC)
+- **AI**: OpenAI Realtime API (gpt-4o) + Coach LLM (gpt-4o)
+- **Backend**: FastAPI (Python)
+- **Database**: PostgreSQL + SQLAlchemy
 
-本專案的前端主要建構於以下技術：
-- **Vite** (極速的前端建置工具)
-- **TypeScript** (提供強型別的 JavaScript，減少 Bug)
-- **React** (前端 UI 框架)
-- **shadcn-ui** (高品質的客製化 UI 元件庫)
-- **Tailwind CSS** (Utility-first CSS 樣式框架)
+## 📂 文件導覽
+詳細的規格與技術細節請參閱 `/docs` 目錄：
+- [產品需求文件 (PRD)](docs/01_Product_Requirements_Document.md)
+- [系統架構設計](docs/02_System_Architecture.md)
+- [系統詳細設計](docs/03_System_Design.md)
+- [API 規格說明](docs/04_API_Specification.md)
+- [資料模型設計](docs/05_Data_Models.md)
+
+## 🏃 快速啟動 (前端)
+1. **安裝依賴**:
+   ```bash
+   npm install
+   ```
+2. **啟動開發伺服器**:
+   ```bash
+   npm run dev
+   ```
+3. **瀏覽**: 開啟 `http://localhost:5173`
+
+> **注意**: 本前端專案需搭配後端 API 與 LiveKit Server 運行。詳細啟動 SOP 請參閱 [STARTUP_SOP.md](STARTUP_SOP.md)。
 
 ---
-
-## 🛠️ 如何參與開發與測試？
-
-請將專案下載到你的電腦上進行本機端的作業。
-**(前置作業：請確保你的電腦已安裝 Node.js 與 npm)**
-
-**開發環境建置步驟：**
-```bash
-# 步驟 1：Clone 這個專案到你的電腦 (僅第一次需要)
-git clone -b frontend_jia https://github.com/AIPE02-team04/ai-classroom.git
-
-# 步驟 2：進入專案資料夾
-cd SELf-corner
-
-# 步驟 3：安裝所有依賴套件 (很重要！)
-npm install
-
-# 步驟 4：啟動本地端開發伺服器
-npm run dev
+*本專案目前處於 v5.0 開發階段，詳細進度請參考 PRD。*

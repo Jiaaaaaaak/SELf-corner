@@ -1,49 +1,40 @@
 # Design Tokens 規範庫 (Design Tokens & Variables)
 
-本文件定義系統中所有的設計變量，是從 Figma 交付至代碼的唯一真理來源。
+本文件定義系統中所有的設計變量，完全同步自最新設計原稿 (`design.pen`)。
 
-## 1. 色彩系統 (Color Palette - Earth Tones)
+## 1. 色彩系統 (Color Palette)
 
-採用語意化命名 (Semantic Naming)，以支援未來的主題擴展。
-
-| 變量名稱 | 色值 (HEX) | 語意用途 |
-| :--- | :--- | :--- |
-| `--color-bg-main` | `#FAF9F6` (Warm Sand) | 全域背景，降低視覺疲勞。 |
-| `--color-primary` | `#E07A5F` (Terracotta) | 主要 CTA 按鈕、關鍵心理指標高亮。 |
-| `--color-secondary` | `#81B29A` (Sage Green) | 成功狀態、進步提示、平靜情緒。 |
-| `--color-accent` | `#F2CC8F` (Soft Gold) | 特別回饋、金牌獎牌、高成就標示。 |
-| `--color-text-main` | `#3D3831` (Dark Espresso) | 主要閱讀文字，取代純黑 (#000)。 |
-| `--color-text-muted` | `#706C61` | 次要描述、Placeholder、輔助訊息。 |
-| `--color-border` | `#E5E2D9` | 輕量分隔線與容器邊框。 |
-
-## 2. 字階與排版 (Typography Scale)
-
-| 層級 (Token) | 大小 (px/rem) | 字重 (Weight) | 用途 |
+| 變量名稱 | 色值 (HEX) | 名稱 | 語意用途 |
 | :--- | :--- | :--- | :--- |
-| `text-display` | 36px / 2.25rem | 700 (Bold) | 大標題、404、關鍵得分。 |
-| `text-h1` | 24px / 1.5rem | 600 (Semibold) | 頁面主標題。 |
-| `text-h2` | 20px / 1.25rem | 600 (Semibold) | 區塊卡片標題。 |
-| `text-body` | 16px / 1rem | 400 (Regular) | 主要對話訊息、專家文案。 |
-| `text-label` | 14px / 0.875rem | 500 (Medium) | 按鈕文字、欄位標籤。 |
-| `text-caption` | 12px / 0.75rem | 400 (Regular) | 時間戳、註腳文字。 |
+| `--color-bg-main` | `#FAF9F6` | Warm Sand | 全域背景。 |
+| `--color-primary` | `#E07A5F` | Terracotta | 主要 CTA、關鍵高亮。 |
+| `--color-secondary` | `#81B29A` | Sage Green | 成功、成長、平靜。 |
+| `--color-accent` | `#F2CC8F` | Soft Gold | 特別成就、指標強調。 |
+| `--color-text-main` | `#3D3831` | Dark Espresso | 主要閱讀文字。 |
+| `--color-text-muted` | `#706C61` | Muted Gray | 次要描述、Placeholder。 |
+| `--color-border` | `#E5E2D9` | Light Border | 分隔線、容器邊框。 |
 
-## 3. 間距與柵格 (Spacing & Grid)
+## 2. 字階系統 (Typography Scale)
 
-採用 4px 增量系統，確保視覺平衡。
+| Token | Size | Weight | 用途 |
+| :--- | :--- | :--- | :--- |
+| `text-display` | 36px | 700 | 頁面大標、得分數字。 |
+| `text-h1` | 24px | 600 | 頁面主標題、卡片標題。 |
+| `text-h2` | 20px | 600 | 區塊標題。 |
+| `text-body` | 16px | 400 | 主要內容、建議文字。 |
+| `text-label` | 14px | 500 | 標籤、按鈕、側邊欄項目。 |
+| `text-caption` | 12px | 400 | 時間、註腳、輔助文字。 |
 
-*   **Base Unit**: `4px`
-*   **Gap Scale**:
-    - `space-xs`: 4px
-    - `space-sm`: 8px
-    - `space-md`: 16px (標準組件內距)
-    - `space-lg`: 24px (組件間距)
-    - `space-xl`: 32px (區塊間距)
-*   **Grid Specs**:
-    - Mobile: 4 Columns / 16px Margin / 16px Gutter.
-    - Desktop: 12 Columns / Auto Margin (Max-width: 1280px) / 24px Gutter.
+## 3. 間距系統 (Spacing)
+*   `space-xs`: 4px
+*   `space-sm`: 8px
+*   `space-md`: 16px
+*   `space-lg`: 24px
+*   `space-xl`: 32px
 
-## 4. 陰影與深度 (Elevations)
-
-*   **Elev-1 (Surface)**: `shadow-sm` (低深度，用於 Card)。
-*   **Elev-2 (Floating)**: `shadow-md` (中深度，用於 Hover 狀態)。
-*   **Elev-3 (Overlay)**: `shadow-lg` (高深度，用於 Dialog/Popover)。
+## 4. 圓角與深度 (Effects)
+*   **Radius**: `sm: 4px`, `md: 8px`, `lg: 12px`, `full: 999px`。
+*   **Shadow**: 
+    - `sm`: 4px blur (Card default)
+    - `md`: 12px blur (Hover state)
+    - `lg`: 24px blur (Dialog/CTA)

@@ -1,44 +1,42 @@
-# 對話空間核心規範 (Chatroom P0 Spec)
+# 對話空間設計規範 (Chatroom Page Spec)
 
-`/chatroom` 是本專案最重要的頁面，需達到「沈浸式」體驗。
+`/chatroom` 是系統的核心，包含「情境選擇」與「對話練習」兩個主要視圖。
 
-## 1. 三階段流程 (Three-Phase Experience)
+## 1. 情境選擇視圖 (Scenario Selection)
 
-### Phase 1: 情境選擇 (Scenario Selection)
-*   **Grid**: 3x2 卡片佈局。
-*   **Interaction**: 
-    - 點選卡片觸發 `ScenarioDetail` 覆蓋層。
-    - "換一批" 按鈕觸發 `Rotate` 360度動畫，並有數據加載的 Skeleton 屏。
-*   **Visual**: 隨機卡片使用 `dashed border`，象徵未知與挑戰。
+### 1.1 頂部工具列 (Toolbar)
+*   **標籤過濾 (Tags)**: 
+    - 啟用中: `#3D3831` 背景, 白色文字。
+    - 未啟用: 透明背景, `#E5E2D9` 邊框, `#706C61` 文字。
+*   **換一批按鈕**: `#E5E2D9` 邊框，Hover 時觸發 `refresh-cw` 圖示旋轉。
 
-### Phase 2: 情境確認 (Briefing)
-*   **Dialog**: 展示情境的人設、背景、核心困難。
-*   **CTA**: "我準備好了，進入教室"。
+### 1.2 情境卡片 (Scenario Card)
+*   **尺寸**: 響應式 Grid 佈局。
+*   **元素**:
+    - Emoji (36px)。
+    - 標題 (16px, Bold)。
+    - 標籤 (小標籤背景 `#F0EDE6`, 文字 `#706C61`)。
+    - 描述文字 (13px, 行高 1.5)。
 
-### Phase 3: 對話進行 (Active Session)
-*   **Layout**: `Header` (功能) + `Center` (學生) + `Bottom` (對話流)。
-*   **Student Avatar**: 
-    - 圓形容器，背景根據情境有微弱漸層。
-    - 表情切換必須平滑。
-*   **ChatPanel (底部控制中心)**:
-    - **對話氣泡**: 
-        - 老師：`bg-primary`, `text-white`, 右側進入。
-        - 學生：`bg-secondary/20`, `text-main`, 左側進入。
-    - **輸入控制**: 支持鍵盤 `Ctrl+Enter` 發送，支援語音波形預覽。
+## 2. 對話練習視圖 (Active Session)
 
-## 2. 核心狀態與異常處理 (Corner Cases)
+### 2.1 學生視覺區 (Student Area)
+*   **Avatar**: 圓形容器 (`120x120px`)，背景 `#F0EDE6`。
+*   **表情符號**: 根據情緒狀態切換 (😤, 🥺, 🤔, 🧑‍🎓)。
+*   **情緒標籤**: 顯示於 Avatar 下方，如「抗拒 · 防衛」 (背景 `#E07A5F15`, 文字 `#E07A5F`)。
 
-| 場景 | UI 表現 |
-| :--- | :--- |
-| **網路延遲** | 學生 Avatar 上方顯示 `...` 氣泡 (Thinking state)。 |
-| **對話暫停** | 全螢幕 `backdrop-blur-md`，置中顯示大字體 "PAUSED"。 |
-| **結束對話** | 彈出確認窗，避免誤觸導致練習紀錄流失。 |
-| **語音輸入** | 麥克風圖標變紅並帶有脈衝波。 |
+### 2.2 對話面板 (Chat Panel)
+*   **輸入模式 (Dual Mode)**: 支援語音輸入與文字輸入。語音輸入透過 LiveKit 實時傳輸，文字輸入透過 Data Channel 送出，皆可觸發 AI 學生回應。
+*   **氣泡樣式**:
+    - **教師 (我)**: 背景 `#E07A5F` (Terracotta)，文字白色，圓角 `16, 16, 4, 16`。
+    - **學生**: 背景 `#81B29A20` (Sage Green 輕量版)，文字深咖，圓角 `16, 16, 16, 4`。
+*   **氣泡內距**: `10px 14px`。
 
-## 3. 視覺參數 (Visual Specs)
-*   **Chat Bubble Radius**: `16px` (外側), `4px` (靠牆側)。
-*   **Max-width (Chat)**: `max-w-[70%]` 避免文字過長難以閱讀。
-*   **Z-index Hierarchy**: 
-    - `PauseOverlay`: 40
-    - `ScenarioDetail`: 30
-    - `Header`: 20
+### 2.3 輸入控制列 (Input Bar)
+*   **Mic Button**: `#E5E2D9` 邊框，內含 `mic` 圖示。
+*   **Input Field**: 背景 `#F8F7F4` (淺米色)，字號 14px。
+*   **Send Button**: 背景 `#E07A5F`，內含白色 `send` 圖示。
+
+## 3. 側邊會話資訊 (Sidebar Session Info)
+*   **Session Card**: 在側邊欄顯示當前練習情境名稱與計時器 (20px Bold, Space Grotesk)。
+*   **底部操作**: 包含「暫停練習」與「結束對話」 (紅色 `#B54A4A`) 按鈕。

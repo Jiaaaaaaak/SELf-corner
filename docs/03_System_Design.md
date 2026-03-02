@@ -1,83 +1,57 @@
-# 系統設計文件 (System Design)
-**專案:** AI 虛擬教師培訓平台
-**狀態:** 草稿 (Draft)
-**版本:** 1.1
-**日期:** 2026-02-28
+# 系統設計文件 (System Design) v5.0
+
+- **最近更新日期**: 2026-02-28
+- **版本**: 5.0
 
 ## 1. 技術棧與選型理由 (Technology Stack)
 
-| 領域 | 技術 | 選型理由 (FAANG 標準評估) |
-|---|---|---|
-| **前端** | React 18, TypeScript, Zustand | TypeScript 提供嚴格型別安全，降低 Runtime 錯誤。React 生態系對於處理複雜狀態與 Web Audio API 支援最為成熟。 |
-| **後端** | FastAPI (Python 3.11+) | Python 是 AI/LLM 整合的業界標準。FastAPI 的 ASGI 非同步特性，完美契合大量 I/O 等待 (API 呼叫) 與 WebSocket 長連線場景。 |
-| **AI 代理** | LangChain / LangGraph | 提供 Agentic Workflow 的標準化抽象，便於管理複雜的 Prompt Chain、工具調用 (Tool Calling) 與記憶體 (Memory)。 |
-| **資料庫** | PostgreSQL 15+ | 支援 ACID 交易，確保資料一致性。其 `JSONB` 欄位型態非常適合儲存非結構化的 LLM 回饋報告。 |
-| **快取/狀態**| Redis 7.x | 用於分散式鎖 (Distributed Locks)、Rate Limiting 以及維持低延遲的會話上下文 (Context Window)。 |
+| 層級 | 技術 | 選型理由 |
+| :--- | :--- | :--- |
+| **後端 API** | FastAPI (Python 3.11+) | 非同步支援優異，適合處理 AI API 的 I/O 等待與 RESTful 服務。 |
+| **前端框架** | React 18 + TypeScript (Vite) | 嚴謹的型別安全，成熟的組件化生態，適配 Vite 快速開發。 |
+| **UI 元件庫** | shadcn/ui + Tailwind CSS | 現代化、高度可自訂的 UI 設計。 |
+| **狀態管理** | TanStack Query + Zustand | 分離伺服器狀態與本地持久化狀態。 |
+| **資料庫** | PostgreSQL + SQLAlchemy 2.0 | 強大的關聯式查詢能力，SQLAlchemy 非同步模式確保效能。 |
+| **即時通訊** | LiveKit (WebRTC) | 專業的語音串流管理與 Agent 工作流程調度。 |
+| **語音 AI** | OpenAI Realtime API | 整合 STT/LLM/TTS，大幅降低對話延遲。 |
+| **教練 AI** | OpenAI gpt-4o | 用於 Session 結束後的深度分析與報告生成。 |
 
-## 2. 整潔架構分層 (Clean Architecture Layering)
+## 2. 核心元件設計：LiveKit Agent Worker
 
-系統嚴格遵循依賴反轉原則 (Dependency Inversion Principle, DIP)：外層依賴內層，內層對外層一無所知。
+LiveKit Agent Worker 是系統的對話核心，它作為橋樑連接了前端與 OpenAI Realtime API。
 
-1.  **介面層 (Presentation):** `routers/`, `websockets/`。處理 HTTP 請求、WebSocket 封包解析與 Pydantic 參數驗證。
-2.  **應用層 (Application - Use Cases):** `services/`, `orchestrator/`。包含 `SessionDirector`。負責業務流程編排，例如：「接收音訊 -> 轉文字 -> 呼叫 Agent -> 儲存紀錄」。
-3.  **領域層 (Domain):** `models/`, `entities/`。包含核心的業務規則，例如：「一場會話最多 20 輪對話」、「分數計算公式」。此層為純 Python，不依賴任何外部框架或 DB。
-4.  **基礎設施層 (Infrastructure):** `repositories/`, `clients/`。實作領域層定義的介面 (Interface/Protocol)。包含 SQLAlchemy 的 DB 存取邏輯、Redis 連線、OpenAI/Qwen 的 API Client。
+### 2.1 對話流程設計
+1. **加入房間**: 用戶進入 `Chatroom` 頁面，前端透過後端 API 取得 LiveKit Token 並加入房間。
+2. **Agent 派發**: LiveKit Server 偵測到新參與者，自動 dispatch 一個 Agent Worker 實例。
+3. **建立連線**: Agent Worker 向 OpenAI Realtime API 建立 WebSocket 連線。
+4. **雙向通訊**:
+    - **語音**: 前端語音透過 WebRTC 傳至 Agent，Agent 轉發至 OpenAI。
+    - **文字**: 前端文字透過 Data Channel 傳至 Agent，Agent 模擬為文字輸入傳至 OpenAI。
+5. **情緒分析**: 在每輪對話中，Agent 呼叫 `semantic_analysis` tool，由 `gpt-3.5-turbo` 進行語意分析並記錄。
 
-## 3. 核心元件設計：會話導演 (Session Director)
+## 3. 回饋報告生成流程
 
-`Session Director` 是系統的心臟，採用狀態機 (State Machine) 概念確保流程可控。
+Session 結束後，系統需生成量化與質化的回饋報告。
 
-```mermaid
-graph TD
-    SessionDirector[Session Director 會話導演]
-    StateManager[State Manager 狀態管理器]
-    TurnManager[Turn Manager 發言權管理器]
-    ContextBuffer[Context Buffer 記憶緩衝區]
-    StudentRunner[Student Agent 執行器]
-    EvaluatorRunner[Evaluator Agent 執行器]
+1. **觸發結束**: 用戶點擊「結束對話」，前端呼叫 `POST /session/{uuid}/end`。
+2. **資料彙整**: 後端從 `transcripts` 表取得該 Session 的完整對話內容。
+3. **Coach LLM 調用**: 使用 LangChain 封裝對 OpenAI `gpt-4o` 的請求，傳入對話紀錄與 SEL/KIST 指引。
+4. **JSON 解析**: 教練生成包含 `sel_scores`、`analysis`、`feedback`、`kist_cards` 的 JSON 字串。
+5. **資料持久化**: 將報告存入 `feedback_reports` 表，標記 Session 為 `completed`。
 
-    SessionDirector --> StateManager
-    SessionDirector --> TurnManager
-    SessionDirector --> ContextBuffer
-    
-    ContextBuffer --> StudentRunner
-    ContextBuffer --> EvaluatorRunner
-```
+## 4. 認證與安全設計
 
-## 4. 系統循序圖：即時對話流程 (Sequence Diagram)
+### 4.1 JWT 與 Cookie 策略
+- **Access Token**: 存儲於 HttpOnly Cookie，有效期 15 分鐘。
+- **Refresh Token**: 存儲於 `refresh_tokens` 表與 HttpOnly Cookie，有效期 7 天。
+- **Token Rotation**: 每次刷新 Token 時，舊的 Refresh Token 會被撤銷並核發新的，防止重放攻擊。
 
-此循序圖展示了 Path A（即時互動迴圈）的詳細內部運作機制，強調了非同步處理以降低延遲。
+### 4.2 API 安全
+- **CORS 設定**: 限制僅允許信任的前端域名存取。
+- **路由保護**: 使用 FastAPI Dependency 注入，確保受保護路由必須具備有效的 `user_id`。
 
-```mermaid
-sequenceDiagram
-    participant Client as React 前端
-    participant Gateway as FastAPI WebSocket
-    participant Director as Session Director
-    participant Redis as Redis (Context)
-    participant Whisper as Whisper STT API
-    participant Qwen as Qwen LLM API
-    participant TTS as TTS Service
-    
-    Client->>Gateway: 傳送語音 Chunk (二進位 WebM)
-    Gateway->>Whisper: 非同步轉錄請求 (HTTP)
-    Whisper-->>Gateway: 回傳文字 (Text)
-    
-    Gateway->>Director: 傳遞使用者文字
-    Director->>Redis: 獲取近 10 輪對話歷史
-    Redis-->>Director: 回傳 Context
-    
-    Director->>Director: 組合 Prompt (Persona + History + Input)
-    Director->>Qwen: 請求生成回應 (Streaming 可選)
-    Qwen-->>Director: 回傳文字與情緒標籤 (JSON)
-    
-    par 非同步處理並行
-        Director->>Redis: 更新對話歷史 (Append)
-        Director->>TTS: 文字轉語音請求
-    end
-    
-    TTS-->>Director: 回傳音訊串流 (MP3/WAV)
-    Director-->>Gateway: 打包 Payload (Audio + Text + Emotion)
-    Gateway-->>Client: WebSocket 推送 (JSON)
-    
-    Client->>Client: 播放音訊並觸發紙娃娃動畫
-```
+## 5. 技術限制與注意事項
+
+- **Realtime API Tool Schema**: 必須嚴格遵循平鋪結構（無 `function` 嵌套），否則會導致 session 更新失敗。
+- **bcrypt 版本**: 釘死在 `4.0.1` 以維持與 `passlib` 的相容性。
+- **DB Migration**: 目前暫無 migration 工具，schema 異動需手動處理或重置資料庫。

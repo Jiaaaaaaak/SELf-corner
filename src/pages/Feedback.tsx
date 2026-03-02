@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from "recharts";
-import { ArrowRight, Lightbulb, Sparkles, RefreshCw, Share2 } from "lucide-react";
+import { 
+  Radar as RechartRadar, 
+  RadarChart, 
+  PolarGrid, 
+  PolarAngleAxis, 
+  ResponsiveContainer, 
+  Tooltip,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid
+} from "recharts";
+import { ArrowRight, Lightbulb, Sparkles, RefreshCw, Share2, MessageSquare, MessageCircle, Activity } from "lucide-react";
 import AppLayout from "@/components/AppLayout";
+import { Badge } from "@/components/ui/badge";
 
 const radarData = [
   { subject: "自我覺察", value: 92 },
@@ -13,6 +26,19 @@ const radarData = [
   { subject: "社會覺察", value: 65 },
   { subject: "同理心連結", value: 80 },
   { subject: "情緒調節", value: 85 },
+];
+
+// Emotion Flow Data
+// Value mapping: 1: 抗拒/防衛, 2: 焦慮/退縮, 3: 平靜/中性, 4: 一致/開放
+const emotionData = [
+  { time: "Start", value: 1, label: "抗拒" },
+  { time: "2m", value: 1, label: "抗拒" },
+  { time: "4m", value: 2, label: "焦慮" },
+  { time: "6m", value: 2, label: "焦慮" },
+  { time: "8m", value: 3, label: "平靜" },
+  { time: "10m", value: 3, label: "平靜" },
+  { time: "12m", value: 4, label: "一致" },
+  { time: "End", value: 4, label: "一致" },
 ];
 
 const defaultChatHistory = [
@@ -37,190 +63,263 @@ const defaultTranscript = [
 export default function Feedback() {
   const navigate = useNavigate();
   const [userInput, setUserInput] = useState("");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const teacherTranscript = defaultTranscript.filter((e) => e.role === "teacher");
   const studentTranscript = defaultTranscript.filter((e) => e.role === "student");
 
+  // Custom Y-axis formatter for emotion levels
+  const formatYAxis = (value: number) => {
+    switch (value) {
+      case 1: return "抗拒";
+      case 2: return "焦慮";
+      case 3: return "平靜";
+      case 4: return "一致";
+      default: return "";
+    }
+  };
+
   return (
     <AppLayout>
-      <div className="p-8 md:p-10 md:px-14 flex flex-col gap-6 min-h-full">
+      <div className="p-8 md:p-12 max-w-7xl mx-auto flex flex-col gap-10 min-h-full animate-in fade-in duration-500">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pl-12 md:pl-0">
-          <div>
-            <span className="font-heading text-[11px] font-semibold tracking-widest text-muted-foreground">
-              FEEDBACK & ANALYSIS
-            </span>
-            <h1 className="font-heading text-[28px] font-bold text-foreground mt-1">
-              專家回饋與深度分析
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              情境：國中生拒絕交作業 · 2025/03/01
-            </p>
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pl-12 lg:pl-0">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+               <Badge className="bg-[#81B29A15] text-[#81B29A] border-[#81B29A30] font-heading font-bold text-[10px] tracking-widest uppercase">Session Completed</Badge>
+               <span className="text-[11px] font-bold text-[#A09C94] uppercase tracking-wider">2025/03/01 14:30</span>
+            </div>
+            <h1 className="font-heading text-3xl font-bold text-[#3D3831] tracking-tight mt-2">專家回饋與深度分析</h1>
+            <p className="text-[15px] text-[#706C61] font-medium">情境：面對考場失利後的自責與壓力</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/chatroom")}
-              className="flex items-center gap-2 px-5 py-2.5 border border-[#E5E2D9] font-heading text-xs font-semibold tracking-wider text-foreground hover:bg-white transition-colors"
+              className="h-11 px-6 border-2 border-[#E5E2D9] rounded-xl font-heading text-sm font-bold text-[#3D3831] hover:bg-white hover:border-[#3D3831] transition-all flex items-center gap-2"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="w-4 h-4" />
               重試一次
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-primary font-heading text-xs font-semibold tracking-wider text-white hover:opacity-90 transition-opacity">
-              <Share2 className="w-3.5 h-3.5" />
+            <button className="h-11 px-6 bg-primary text-white rounded-xl font-heading text-sm font-bold shadow-lg shadow-primary/20 hover:bg-[#C8694F] transition-all flex items-center gap-2">
+              <Share2 className="w-4 h-4" />
               分享練習
             </button>
           </div>
         </div>
 
-        {/* Two column layout */}
-        <div className="flex flex-col lg:flex-row gap-6 flex-1">
-          {/* Left column */}
-          <div className="lg:w-[400px] shrink-0 flex flex-col gap-6">
-            {/* Radar chart */}
-            <div className="bg-white border border-[#E5E2D9] shadow-sm p-6">
-              <h2 className="font-heading text-base font-semibold text-foreground mb-4">五力雷達圖</h2>
-              <div className="h-[300px] bg-[#F8F7F4] flex items-center justify-center">
+        {/* Main Dashboard */}
+        <div className="flex flex-col lg:flex-row gap-8 flex-1">
+          {/* Left: Metrics & Charts */}
+          <div className="lg:w-[440px] shrink-0 flex flex-col gap-8">
+            {/* Radar Card */}
+            <div className="bg-white border border-[#E5E2D9] rounded-2xl shadow-sm p-8 flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                 <h2 className="font-heading text-lg font-bold text-[#3D3831]">五力指標分佈</h2>
+                 <Badge variant="outline" className="text-primary border-primary/20 bg-primary/5">Grade A+</Badge>
+              </div>
+              <div className="h-[300px] bg-[#FAF9F6] rounded-xl flex items-center justify-center overflow-hidden border border-[#E5E2D9]/50">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarData} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
-                    <PolarGrid stroke="hsl(var(--border))" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: "#706C61", fontSize: 12, fontWeight: 500 }} />
-                    <Tooltip contentStyle={{ borderRadius: '4px', border: '1px solid #E5E2D9', boxShadow: '0 4px 12px rgba(61,56,49,0.13)' }} />
-                    <Radar name="本次表現" dataKey="value" stroke="#E07A5F" strokeWidth={2} fill="#E07A5F" fillOpacity={0.15} />
+                  <RadarChart data={radarData} margin={{ top: 30, right: 40, bottom: 30, left: 40 }}>
+                    <PolarGrid stroke="#E5E2D9" />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: "#706C61", fontSize: 11, fontWeight: 600 }} />
+                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
+                    <RechartRadar name="本次表現" dataKey="value" stroke="#E07A5F" strokeWidth={3} fill="#E07A5F" fillOpacity={0.2} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Expert advice */}
-            <div className="bg-white border border-[#E5E2D9] shadow-sm p-6">
-              <h2 className="font-heading text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Lightbulb className="w-4 h-4 text-primary" />
-                專家建議
-              </h2>
-              <ScrollArea className="h-[240px] pr-2">
-                <div className="space-y-5">
-                  <div className="space-y-2 bg-[#F8F7F4] p-4 border border-[#E5E2D9]">
-                    <h3 className="font-heading text-sm font-bold text-foreground">1. 建立「情緒預警系統」</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      老師精準捕捉到了「手心冒汗」。建議進一步引導學生在情緒爆炸前 30 秒就發現問題。
-                    </p>
-                    <div className="bg-primary/10 p-3 flex items-start gap-2 mt-2">
-                      <ArrowRight className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <p className="text-sm font-medium text-foreground">
-                        換句話說：「除了手心冒汗，你的肩膀會緊繃嗎？下次如果肩膀又緊緊的，我們能做什麼？」
-                      </p>
+            {/* Emotion Flow Card */}
+            <div className="bg-white border border-[#E5E2D9] rounded-2xl shadow-sm p-8 flex flex-col gap-6">
+              <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-primary" />
+                    <h2 className="font-heading text-lg font-bold text-[#3D3831]">學生情緒流動</h2>
+                 </div>
+                 <Badge className="bg-secondary/10 text-secondary border-none text-[10px]">Positive Trend</Badge>
+              </div>
+              <div className="h-[240px] w-full pt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={emotionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#E07A5F" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#E07A5F" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E2D9" />
+                    <XAxis 
+                      dataKey="time" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#A09C94', fontSize: 10, fontWeight: 600 }}
+                    />
+                    <YAxis 
+                      domain={[1, 4]} 
+                      ticks={[1, 2, 3, 4]} 
+                      tickFormatter={formatYAxis}
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#706C61', fontSize: 11, fontWeight: 700 }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
+                      formatter={(value: number) => [formatYAxis(value), "情緒狀態"]}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#E07A5F" 
+                      strokeWidth={3} 
+                      fillOpacity={1} 
+                      fill="url(#colorValue)" 
+                      dot={{ r: 4, fill: '#E07A5F', strokeWidth: 2, stroke: '#fff' }}
+                      activeDot={{ r: 6, shadow: '0 0 10px rgba(224,122,95,0.5)' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-[12px] text-[#706C61] font-medium leading-relaxed italic text-center">
+                學生的對話姿態從「防衛」成功轉化為「一致開放」
+              </p>
+            </div>
+
+            {/* Expert Suggestions */}
+            <div className="bg-white border border-[#E5E2D9] rounded-2xl shadow-sm p-8 flex flex-col gap-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                   <Lightbulb className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="font-heading text-lg font-bold text-[#3D3831]">核心優化建議</h2>
+              </div>
+              <ScrollArea className="h-[260px] pr-4">
+                <div className="space-y-6">
+                  {[
+                    { id: 1, title: "建立「情緒預警系統」", text: "老師精準捕捉到了『手心冒汗』。建議進一步引導學生在情緒爆炸前 30 秒就發現生理反應。", quote: "換句話說：「除了手心冒汗，你的肩膀會緊繃嗎？下次如果感覺緊繃，我們能先深呼吸嗎？」" },
+                    { id: 2, title: "深化薩提爾的「渴望」層次", text: "學生提到『不想讓他覺得我好欺負』，這反映了對『被尊重』的渴望。", quote: "換句話說：「聽起來你很在意他是否尊重你。我們怎麼表達需求，同時也展現你的力量？」" }
+                  ].map(adv => (
+                    <div key={adv.id} className="space-y-3 p-5 bg-[#FAF9F6] border border-[#E5E2D9] rounded-xl group hover:border-primary/30 transition-colors">
+                      <h3 className="font-heading text-[15px] font-bold text-[#3D3831] flex items-center gap-2">
+                         <span className="text-primary opacity-50">0{adv.id}</span> {adv.title}
+                      </h3>
+                      <p className="text-sm text-[#706C61] font-medium leading-relaxed">{adv.text}</p>
+                      <div className="bg-white border-l-4 border-primary p-3 flex items-start gap-3 rounded-r-lg shadow-sm">
+                        <MessageSquare className="w-4 h-4 text-primary shrink-0 opacity-20" />
+                        <p className="text-[13px] font-bold text-[#3D3831] leading-relaxed italic">{adv.quote}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-2 bg-[#F8F7F4] p-4 border border-[#E5E2D9]">
-                    <h3 className="font-heading text-sm font-bold text-foreground">2. 深化薩提爾的「渴望」層次</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      老師提議了「我訊息」，但學生提到「不想讓他覺得我好欺負」，這反映了冰山底層對「被尊重」的渴望。
-                    </p>
-                    <div className="bg-primary/10 p-3 flex items-start gap-2 mt-2">
-                      <ArrowRight className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <p className="text-sm font-medium text-foreground">
-                        換句話說：「聽起來你很在意他是否尊重你。我們怎麼表達『我需要安靜』，同時也能展現你的力量？」
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </ScrollArea>
             </div>
           </div>
 
-          {/* Right column */}
-          <div className="flex-1 flex flex-col gap-6 min-w-0">
-            {/* Transcript */}
-            <div className="bg-white border border-[#E5E2D9] shadow-sm flex flex-col flex-1 min-h-[400px] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[#E5E2D9]">
-                <h2 className="font-heading text-base font-semibold text-foreground">對話逐字稿回顧</h2>
-                <Tabs defaultValue="combined" className="w-[160px]">
-                  <TabsList className="grid w-full grid-cols-2 h-8">
-                    <TabsTrigger value="combined" className="text-xs">完整</TabsTrigger>
-                    <TabsTrigger value="separate" className="text-xs">對照</TabsTrigger>
+          {/* Right: Transcript & AI Coach */}
+          <div className="flex-1 flex flex-col gap-8 min-w-0">
+            {/* Transcript Card */}
+            <div className="bg-white border border-[#E5E2D9] rounded-2xl shadow-sm flex flex-col flex-1 min-h-[500px] overflow-hidden">
+              <div className="flex items-center justify-between px-8 py-5 border-b border-[#E5E2D9] bg-[#FAF9F6]/50">
+                <div className="flex items-center gap-3">
+                   <MessageCircle className="w-5 h-5 text-primary" />
+                   <h2 className="font-heading text-lg font-bold text-[#3D3831]">對話逐字稿回顧</h2>
+                </div>
+                <Tabs defaultValue="combined" className="w-[180px]">
+                  <TabsList className="grid w-full grid-cols-2 h-9 rounded-lg bg-[#E5E2D9]/30 p-1">
+                    <TabsTrigger value="combined" className="text-xs font-bold rounded-md">完整視圖</TabsTrigger>
+                    <TabsTrigger value="separate" className="text-xs font-bold rounded-md">雙員對照</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
-              <ScrollArea className="flex-1 px-6 py-4">
+              
+              <ScrollArea className="flex-1 px-8 py-8">
                 <Tabs defaultValue="combined" className="w-full">
-                  <TabsContent value="combined" className="m-0 space-y-4">
+                  <TabsContent value="combined" className="m-0 space-y-6">
                     {defaultTranscript.map((entry, index) => (
-                      <div key={index} className={`flex flex-col ${entry.role === "teacher" ? "items-end" : "items-start"}`}>
+                      <div key={index} className={`flex flex-col ${entry.role === "teacher" ? "items-end" : "items-start"} animate-in fade-in slide-in-from-bottom-2 duration-500`} style={{ animationDelay: `${index * 50}ms` }}>
                         <div
-                          className={`max-w-[75%] px-4 py-3 ${
+                          className={`max-w-[80%] px-5 py-4 shadow-sm border ${
                             entry.role === "teacher"
-                              ? "bg-primary text-white rounded-2xl rounded-br-sm"
-                              : "bg-[#81B29A20] text-foreground rounded-2xl rounded-bl-sm"
-                          } ${entry.highlight ? 'ring-2 ring-accent ring-offset-2 ring-offset-white' : ''}`}
+                              ? "bg-primary text-white border-primary/10 rounded-[20px] rounded-tr-none"
+                              : "bg-white border-[#E5E2D9] text-[#3D3831] rounded-[20px] rounded-tl-none font-medium"
+                          } ${entry.highlight ? 'ring-4 ring-accent/20 border-accent/50' : ''}`}
                         >
-                          <p className="text-[10px] font-bold mb-1 uppercase tracking-wider opacity-70">
-                            {entry.role === "teacher" ? "老師" : "學生"}
-                          </p>
-                          <p className="text-sm leading-relaxed">{entry.content}</p>
+                          <span className="text-[9px] font-bold uppercase tracking-[0.2em] mb-2 block opacity-60">
+                            {entry.role === "teacher" ? "Teacher Mode" : "Student Input"}
+                          </span>
+                          <p className="text-[15px] leading-relaxed">{entry.content}</p>
                         </div>
                         {entry.highlight && entry.note && (
-                          <div className="mt-2 max-w-[75%] bg-accent/20 text-accent-foreground text-xs px-3 py-1.5 font-medium border border-accent/30 flex items-center gap-1">
-                            <Sparkles className="h-3 w-3" />
-                            {entry.note}
+                          <div className="mt-3 max-w-[80%] bg-accent/10 text-[#B8A06A] text-[12px] px-4 py-2.5 font-bold rounded-xl border border-accent/20 flex items-start gap-3 shadow-sm">
+                            <Sparkles className="h-4 w-4 shrink-0 mt-0.5" />
+                            <p className="leading-relaxed">{entry.note}</p>
                           </div>
                         )}
                       </div>
                     ))}
                   </TabsContent>
-                  <TabsContent value="separate" className="m-0">
-                    <div className="grid grid-cols-2 gap-4 pb-2 border-b border-[#E5E2D9] sticky top-0 bg-white z-20">
-                      <div className="font-heading font-bold text-center text-primary text-sm">老師</div>
-                      <div className="font-heading font-bold text-center text-muted-foreground text-sm">學生</div>
-                    </div>
-                    <div className="pt-4 space-y-4">
-                      {Array.from({ length: Math.max(teacherTranscript.length, studentTranscript.length) }).map((_, index) => (
-                        <div key={index} className="grid grid-cols-2 gap-4">
-                          <div className="flex justify-end">
-                            {teacherTranscript[index] && (
-                              <div className={`bg-primary text-white rounded-2xl rounded-tr-sm p-3 w-[90%] ${teacherTranscript[index].highlight ? 'ring-2 ring-accent' : ''}`}>
-                                <p className="text-sm">{teacherTranscript[index].content}</p>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex justify-start">
-                            {studentTranscript[index] && (
-                              <div className="bg-[#81B29A20] text-foreground rounded-2xl rounded-tl-sm p-3 w-[90%]">
-                                <p className="text-sm">{studentTranscript[index].content}</p>
-                              </div>
-                            )}
-                          </div>
+                  <TabsContent value="separate" className="m-0 space-y-6">
+                     <div className="grid grid-cols-2 gap-8 sticky top-0 bg-white/90 backdrop-blur-sm z-20 pb-4 border-b border-[#E5E2D9]/50">
+                        <span className="font-heading text-xs font-bold text-center text-primary uppercase tracking-widest">Teacher Transcript</span>
+                        <span className="font-heading text-xs font-bold text-center text-[#706C61] uppercase tracking-widest">Student Transcript</span>
+                     </div>
+                     {Array.from({ length: Math.max(teacherTranscript.length, studentTranscript.length) }).map((_, idx) => (
+                        <div key={idx} className="grid grid-cols-2 gap-8 items-start">
+                           <div className="flex justify-end">
+                              {teacherTranscript[idx] && (
+                                 <div className="bg-primary text-white p-4 rounded-[18px] rounded-tr-none text-sm font-medium shadow-sm w-full">
+                                    {teacherTranscript[idx].content}
+                                 </div>
+                              )}
+                           </div>
+                           <div className="flex justify-start">
+                              {studentTranscript[idx] && (
+                                 <div className="bg-[#FAF9F6] border border-[#E5E2D9] text-[#3D3831] p-4 rounded-[18px] rounded-tl-none text-sm font-medium shadow-sm w-full">
+                                    {studentTranscript[idx].content}
+                                 </div>
+                              )}
+                           </div>
                         </div>
-                      ))}
-                    </div>
+                     ))}
                   </TabsContent>
                 </Tabs>
               </ScrollArea>
             </div>
 
-            {/* AI Coach */}
-            <div className="bg-white border border-[#E5E2D9] shadow-sm p-6 flex flex-col gap-4">
-              <h2 className="font-heading text-base font-semibold text-foreground">與督導對話</h2>
-              <div className="space-y-3">
+            {/* AI Coach Card */}
+            <div className="bg-[#3D3831] rounded-2xl shadow-xl p-8 flex flex-col gap-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center shadow-lg">
+                   <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="font-heading text-lg font-bold text-white tracking-wide">與 AI 專業督導對話</h2>
+              </div>
+              
+              <div className="flex flex-col gap-4 relative z-10">
                 {defaultChatHistory.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[85%] px-4 py-3 text-sm leading-relaxed ${
-                      msg.role === "user"
-                        ? "bg-secondary text-white rounded-2xl rounded-br-sm"
-                        : "bg-[#F8F7F4] border border-[#E5E2D9] text-foreground rounded-2xl rounded-bl-sm"
-                    }`}>
+                  <div key={i} className="flex justify-start">
+                    <div className="max-w-[90%] px-5 py-4 bg-white/10 border border-white/10 text-white/90 text-sm leading-relaxed rounded-[18px] rounded-tl-none font-medium">
                       {msg.content}
                     </div>
                   </div>
                 ))}
               </div>
-              <Textarea
-                placeholder="問問督導：如果學生一直沈默怎麼辦..."
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                className="min-h-[70px] resize-none text-sm border-[#E5E2D9] bg-[#FAF9F6]"
-              />
-              <button className="w-full py-2.5 bg-secondary text-white font-heading text-sm font-semibold tracking-wider hover:opacity-90 transition-opacity">
-                傳送訊息
-              </button>
+
+              <div className="relative z-10 flex flex-col gap-3">
+                <Textarea
+                  placeholder="詢問督導建議：例如『如何更好地處理學生的抵觸情緒？』"
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  className="min-h-[100px] resize-none text-[15px] border-white/10 bg-white/5 text-white placeholder:text-white/30 rounded-xl focus:ring-secondary/50 focus:border-secondary transition-all"
+                />
+                <button className="h-12 w-full bg-secondary text-white font-heading font-bold text-sm tracking-widest rounded-xl hover:bg-[#6FA088] hover:shadow-lg hover:shadow-secondary/20 transition-all flex items-center justify-center gap-2">
+                  <ArrowRight className="w-4 h-4 fill-current" />
+                  發送諮詢訊息
+                </button>
+              </div>
             </div>
           </div>
         </div>

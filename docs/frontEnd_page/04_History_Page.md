@@ -1,21 +1,35 @@
-# 歷史紀錄與進步軌跡規範 (History & Tracker Spec)
+# 歷史紀錄設計規範 (History Page Spec)
 
-`/history` 頁面不只是列表，它是用戶「成長的可視化證明」。
+`/history` 頁面讓用戶回顧過去的練習，並觀察成長趨勢。
 
-## 1. 視覺設計 (Visual Design)
-*   **Search Bar**: 採用 `shadcn/ui` Input 搭配邊界漸層效果。
-*   **List Item**: 
-    - 採用輕量化的 Card 容器。
-    - Hover 效果：`border-primary/50`, `scale-[1.01]` 微幅放大感。
+## 1. 視覺佈局
+*   **Header Row**: 標題、標籤與搜尋框。
+*   **Filter Row**: 時間與分類篩選器。
+*   **List Area**: 垂直排列的練習紀錄卡片。
 
-## 2. 交互邏輯
-*   **Skeleton Loading**: 當加載大量歷史數據時，應顯示與列表結構一致的 `Pulse` 骨架屏。
-*   **Empty State**: 顯示溫暖的插圖與 "還沒有練習紀錄嗎？去對話空間看看吧！" 的引導按鈕。
+## 2. 區塊詳細規範
 
-## 3. 搜尋優化
-*   支持關鍵字 (主題、情境) 與日期範圍過濾。
-*   輸入時具備 `Debounce` (300ms)，減少無意義的渲染負擔。
+### 2.1 搜尋與篩選 (Search & Filters)
+*   **搜尋框**: 寬 `280px`，邊框 `#E5E2D9`，使用 `Inter` 字體。
+*   **篩選按鈕**: 
+    - 具備 `calendar` 或 `chevron-down` 圖示。
+    - 內距 `8px 14px`，文字字號 12px (Space Grotesk)。
 
-## 4. 響應式佈局
-*   Mobile: 日期與標題改為垂直疊放。
-*   Desktop: 日期靠左對齊，標題居中，右側預留「查看回饋」按鈕。
+### 2.2 紀錄列表項目 (List Item)
+*   **容器**: 
+    - 背景 `#FFFFFF`，邊框 `#E5E2D9`。
+    - 具備極細微陰影 `shadow-sm` (透明度 0.08)。
+*   **內容組成**:
+    - **日期欄**: 寬 `80px`，日期 (14px Bold) 搭配 星期 (12px Muted)。
+    - **Emoji**: 大型圖示 (32px)，居中顯示。
+    - **資訊欄**: 
+        - 標題 (15px, Bold, 深咖)。
+        - 輔助資訊 (12px, Muted): "練習時長 15:42 · 回合數 12"。
+    - **評分標籤 (Score Badge)**: 
+        - A+: 背景 `#81B29A15`, 文字 `#81B29A`。
+        - B+: 背景 `#F2CC8F15`, 文字 `#D4A853`。
+    - **導向圖示**: `chevron-right` (顏色 `#A09C94`)。
+
+## 3. 響應式適配
+*   **Mobile**: 日期欄與 Emoji 縮小，標題文字自動換行。
+*   **Empty State**: 當無紀錄時，顯示溫暖的提示文案與前往對話空間的按鈕。

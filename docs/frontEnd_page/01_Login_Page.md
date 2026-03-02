@@ -1,31 +1,43 @@
-# 登入頁面規範 (Login Page Spec)
+# 登入頁面設計規範 (Login Page Spec)
 
-`/login` 頁面不僅是入口，更是建立「安全感」的第一步。
+`/login` 頁面旨在建立教師對平台的安全感與信賴感。
 
-## 1. 視覺目標 (Visual Goal)
-*   **Aesthetic**: 溫暖、簡約、高可信度。
-*   **Layout**: Center-aligned card layout。
+## 1. 視覺參數 (Visual Specs)
+*   **背景**: `#FAF9F6` (Warm Sand)。
+*   **Login Card**: 
+    - 寬度: `440px`。
+    - 填充: `#FFFFFF`。
+    - 邊框: `1px solid #E5E2D9`。
+    - 內距 (Padding): `40px`。
 
-## 2. 組件拆解 (Atomic Breakdown)
+## 2. 頁面狀態矩陣 (State Matrix)
 
-### 2.1 Atoms (原子)
-*   `LoginInput`: 繼承自 `shadcn/ui` Input，具備微小的 `focus-ring-primary/20`。
-*   `PrimaryButton`: `bg-primary` (Terracotta)，Hover 時略微加深色值。
-*   `BrandSlogan`: "每個老師，都需要一個能安心犯錯的角落。" (Italic, text-muted-foreground)。
+### 2.1 Empty State (初始狀態)
+*   **Input**: 顯示佔位符文字 (Email, Password)，顏色 `#A09C94`。
+*   **Login Button**: 
+    - 背景色: `#D4C4B8` (禁用色)。
+    - 文字顏色: `#A09C94`。
+    - 狀態: `Disabled`。
 
-### 2.2 Molecules (分子)
-*   `PasswordField`: 包含可視性切換按鈕 (Eye/EyeOff)，切換時具備 150ms 的動畫。
-*   `ValidationMessage`: 錯誤提示使用 `text-destructive` (柔和紅)，而非刺眼紅。
+### 2.2 Filled State (已填寫狀態)
+*   **Login Button**: 
+    - 背景色: `#E07A5F` (主色 Terracotta)。
+    - 文字顏色: `#FFFFFF`。
+    - 狀態: `Enabled`。
 
-## 3. 狀態矩陣 (State Matrix)
+### 2.3 Validating State (驗證中)
+*   **Input**: 透明度降至 `0.6`。
+*   **Login Button**: 
+    - 文字變更為 "驗證中..."。
+    - 前方顯示 `loader` (Lucide) 旋轉動畫。
+    - 背景色稍微變深至 `#C8694F`。
 
-| 狀態 | 視覺表現 | 觸發條件 |
-| :--- | :--- | :--- |
-| **Empty** | Login 按鈕 Disabled。 | 欄位未填寫。 |
-| **Validating** | 按鈕顯示 `Loader2` 動畫，文字變為 "驗證中..."。 | 點擊登入後。 |
-| **Error** | 輸入框邊框變為 `destructive` 色調，下方出現 Shake 動畫。 | API 回傳錯誤。 |
-| **Success** | 全頁面漸隱 (Opacity: 1 -> 0)，導向 `/home`。 | 驗證通過。 |
+### 2.4 Error State (錯誤狀態)
+*   **Error Banner**: 出現於 Card 頂部，背景 `#B54A4A14`，左側 3px 紅色邊框，文字顏色 `#B54A4A`。
+*   **Input Border**: 變更為 `#B54A4A` (Error Red)。
+*   **Interaction**: Card 觸發輕微的 `Shake` 震動動畫。
 
-## 4. 交互規範 (Interactions)
-*   **Enter Key**: 在密碼框按下 Enter 應等同於點擊登入。
-*   **Dialog Transition**: 註冊/忘記密碼彈窗彈出時，背景使用 `blur-sm`。
+## 3. 組件細節
+*   **Slogan**: "每個老師，都需要一個能安心犯錯的角落。" (字體: Inter, 字號: 14, 斜體, 顏色: `#706C61`)。
+*   **Brand Icon**: `#E07A5F` 方塊底色搭配白色標誌。
+*   **Password Toggle**: 使用 `eye` / `eye-off` 圖示，顏色 `#A09C94`。

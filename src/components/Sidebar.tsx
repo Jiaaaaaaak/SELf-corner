@@ -4,16 +4,17 @@ import {
   MessageCircle,
   Radar,
   Clock3,
-  Settings,
+  User,
   LogOut,
+  ChevronRight,
 } from "lucide-react";
 
 const navItems = [
   { label: "首頁 Home", icon: House, path: "/home" },
   { label: "對話練習", icon: MessageCircle, path: "/chatroom" },
-  { label: "能力雷達", icon: Radar, path: "/feedback" },
+  { label: "專家回饋", icon: Radar, path: "/feedback" },
   { label: "歷史紀錄", icon: Clock3, path: "/history" },
-  { label: "設定", icon: Settings, path: "/info" },
+  { label: "個人帳號", icon: User, path: "/info" },
 ];
 
 interface SidebarProps {
@@ -27,7 +28,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
   const user = {
     name: "王老師",
     email: "teacher@school.edu.tw",
-    initial: "T",
+    initial: "W",
   };
 
   const handleNav = (path: string) => {
@@ -38,36 +39,44 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="flex flex-col h-full w-[260px] bg-[#1E1D1B] text-[#FAF9F6] py-8 px-6">
-      {/* Brand */}
-      <div className="flex items-center gap-2.5 mb-12">
-        <div className="w-7 h-7 bg-primary rounded-sm shrink-0" />
-        <span className="font-heading text-base font-bold tracking-wider">
+    <div className="flex flex-col h-full w-[260px] bg-[#1E1D1B] text-[#FAF9F6] py-8 px-0 border-r border-white/5">
+      {/* Brand area */}
+      <div className="flex items-center gap-3 px-6 mb-12">
+        <div className="w-7 h-7 bg-primary flex items-center justify-center text-white font-bold rounded-sm text-sm shadow-sm">
+          S
+        </div>
+        <span className="font-heading text-base font-bold tracking-widest uppercase">
           SELf-corner
         </span>
       </div>
 
-      {/* Menu label */}
-      <span className="font-heading text-[11px] font-semibold tracking-widest text-[#706C61] mb-3">
-        MENU
-      </span>
+      {/* Menu Label */}
+      <div className="px-6 mb-4">
+        <span className="font-heading text-[10px] font-bold tracking-[0.2em] text-[#706C61]">
+          MAIN NAVIGATION
+        </span>
+      </div>
 
       {/* Nav items */}
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1.5 px-3">
         {navItems.map((item) => {
           const active = isActive(item.path);
           return (
             <button
               key={item.path}
               onClick={() => handleNav(item.path)}
-              className={`flex items-center gap-3 px-3 py-2.5 text-[13px] font-heading font-medium transition-colors rounded-sm ${
+              className={`flex items-center gap-3 px-4 py-3 text-[13px] font-heading font-semibold transition-all rounded-sm group relative ${
                 active
-                  ? "bg-[#E07A5F15] text-primary border-l-4 border-primary -ml-px"
+                  ? "bg-primary/15 text-primary"
                   : "text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5"
               }`}
             >
-              <item.icon className="w-5 h-5 shrink-0" />
-              {item.label}
+              {active && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+              )}
+              <item.icon className={`w-5 h-5 shrink-0 transition-colors ${active ? "text-primary" : "group-hover:text-[#FAF9F6]"}`} />
+              <span className="flex-1 text-left">{item.label}</span>
+              {active && <ChevronRight className="w-4 h-4 text-primary/50" />}
             </button>
           );
         })}
@@ -77,28 +86,32 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
       <div className="flex-1" />
 
       {/* Logout */}
-      <button
-        onClick={() => handleNav("/login")}
-        className="flex items-center gap-3 px-3 py-2.5 text-[13px] font-heading font-medium text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5 transition-colors rounded-sm mb-4"
-      >
-        <LogOut className="w-5 h-5 shrink-0" />
-        登出
-      </button>
+      <div className="px-3 mb-6">
+        <button
+          onClick={() => handleNav("/login")}
+          className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-heading font-semibold text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5 transition-all rounded-sm group"
+        >
+          <LogOut className="w-5 h-5 shrink-0 group-hover:text-destructive transition-colors" />
+          <span>登出系統</span>
+        </button>
+      </div>
 
-      {/* User area */}
-      <div className="flex items-center gap-3 pt-4 border-t border-white/10">
-        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0">
-          <span className="font-heading text-sm font-bold text-white">
-            {user.initial}
-          </span>
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span className="font-heading text-[13px] font-semibold truncate">
-            {user.name}
-          </span>
-          <span className="text-[11px] text-[#706C61] truncate">
-            {user.email}
-          </span>
+      {/* User profile info */}
+      <div className="px-6 pt-6 border-t border-white/5">
+        <div className="flex items-center gap-3 group cursor-pointer" onClick={() => handleNav("/info")}>
+          <div className="w-10 h-10 rounded-full bg-[#3D3831] border border-white/10 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+            <span className="font-heading text-sm font-bold text-primary">
+              {user.initial}
+            </span>
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="font-heading text-[13px] font-bold truncate group-hover:text-primary transition-colors">
+              {user.name}
+            </span>
+            <span className="text-[11px] text-[#706C61] truncate">
+              教育訓練模式
+            </span>
+          </div>
         </div>
       </div>
     </div>
