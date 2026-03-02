@@ -1,38 +1,36 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import AppLayout from "@/components/AppLayout";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import classroomBg from "@/assets/classroom-background.png";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Dices,
   RefreshCw,
   HelpCircle,
   AlertCircle,
-  Play,
-  RotateCcw,
+  Menu,
+  MessageCircle,
+  Radar,
+  CirclePause,
+  CirclePlay,
+  LogOut,
 } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import ScenarioCard from "@/components/chatroom/ScenarioCard";
 import ScenarioDetail from "@/components/chatroom/ScenarioDetail";
 import RandomConfirm from "@/components/chatroom/RandomConfirm";
 import ChatPanel from "@/components/chatroom/ChatPanel";
 
 const allScenarios = [
-  { id: 1, title: "考場失利後的自責", tag: "自我覺察", emoji: "📝", description: "學生在一次重要考試中表現不佳，感到極度自責和沮喪。他開始質疑自己的能力，甚至不想再上學。" },
-  { id: 2, title: "分組被落單的窘迫", tag: "社會覺察", emoji: "👥", description: "班上分組活動時，有一位學生總是最後一個被選或直接被遺漏。他表面上裝作無所謂，但內心其實很受傷。" },
-  { id: 3, title: "被當眾誤解的憤怒", tag: "自我管理", emoji: "😤", description: "學生在課堂上被同學誤解並當眾指責，他非常憤怒，差點失控動手。你需要幫助他冷靜下來。" },
-  { id: 4, title: "好朋友吵架的糾結", tag: "人際技巧", emoji: "🤝", description: "兩個好朋友因為一件小事吵架了，其中一位來找你傾訴。他既想和好，又覺得委屈。引導他學習溝通技巧。" },
-  { id: 5, title: "面對新環境的焦慮", tag: "自我覺察", emoji: "🌱", description: "學生剛轉學到新班級，對陌生的環境和同學感到極度焦慮。他不敢主動交朋友，午餐時間總是一個人。" },
-  { id: 6, title: "承認作弊後的羞愧", tag: "負責決策", emoji: "💭", description: "學生在考試中作弊被發現，他感到非常羞愧，不知道如何面對老師和同學。引導他理解誠實的重要性。" },
+  { id: 1, title: "考場失利後的自責", tag: "自我覺察", emoji: "📝", description: "學生在一次重要考試中表現不佳，感到極度自責和沮喪。他開始質疑自己的能力，甚至不想再上學。作為老師，你需要引導他認識情緒、接納失敗，並重建自信。" },
+  { id: 2, title: "分組被落單的窘迫", tag: "社會覺察", emoji: "👥", description: "班上分組活動時，有一位學生總是最後一個被選或直接被遺漏。他表面上裝作無所謂，但內心其實很受傷。你需要幫助他理解社交動態，並找到融入團體的方式。" },
+  { id: 3, title: "被當眾誤解的憤怒", tag: "自我管理", emoji: "😤", description: "學生在課堂上被同學誤解並當眾指責，他非常憤怒，差點失控動手。你需要在這個情緒高漲的時刻幫助他冷靜下來，學習如何管理憤怒情緒。" },
+  { id: 4, title: "好朋友吵架的糾結", tag: "人際技巧", emoji: "🤝", description: "兩個好朋友因為一件小事吵架了，其中一位來找你傾訴。他既想和好，又覺得委屈。你需要引導他學習溝通技巧，修復友誼關係。" },
+  { id: 5, title: "面對新環境的焦慮", tag: "自我覺察", emoji: "🌱", description: "學生剛轉學到新班級，對陌生的環境和同學感到極度焦慮。他不敢主動交朋友，午餐時間總是一個人。你需要幫助他建立安全感，逐步適應新環境。" },
+  { id: 6, title: "承認作弊後的羞愧", tag: "負責決策", emoji: "💭", description: "學生在考試中作弊被發現，他感到非常羞愧，不知道如何面對老師和同學。你需要引導他理解誠實的重要性，並幫助他做出負責任的決定。" },
 ];
 
 const DISPLAY_COUNT = 6;
-const TAGS = ["全部", "自我覺察", "自我管理", "社會覺察", "人際技巧", "負責決策"];
 
 function pickRandomScenarios(pool: typeof allScenarios, count: number) {
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
@@ -43,14 +41,28 @@ export default function Chatroom() {
   const navigate = useNavigate();
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [studentEmotion, setStudentEmotion] = useState<"neutral" | "angry" | "sad" | "thinking">("neutral");
   const [selectedScenarioId, setSelectedScenarioId] = useState<number | null>(null);
-  const [activeTag, setActiveTag] = useState("全部");
   const [showRandomConfirm, setShowRandomConfirm] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [displayedScenarios, setDisplayedScenarios] = useState(() =>
     pickRandomScenarios(allScenarios, DISPLAY_COUNT)
   );
+
+  // Live timer
+  useEffect(() => {
+    if (!isStarted || isPaused) return;
+    const interval = setInterval(() => setElapsedSeconds((s) => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [isStarted, isPaused]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60).toString().padStart(2, "0");
+    const sec = (s % 60).toString().padStart(2, "0");
+    return `${m}:${sec}`;
+  };
 
   const selectedScenario = allScenarios.find((s) => s.id === selectedScenarioId) || null;
 
@@ -92,206 +104,229 @@ export default function Chatroom() {
     }
   };
 
-  return (
-    <AppLayout>
-      <div className="flex flex-col h-full overflow-hidden">
-        {/* Top Header Toolbar */}
-        <header className="h-16 bg-white border-b border-[#E5E2D9] flex items-center justify-between px-8 shrink-0 z-20">
-          <div className="flex items-center gap-4 pl-12 lg:pl-0">
-             <Badge variant="outline" className="font-heading text-[10px] font-bold tracking-widest uppercase border-primary/30 text-primary">
-               {isStarted ? "Active Practice" : "Scenario Selection"}
-             </Badge>
-             <h2 className="text-sm font-bold text-[#3D3831] truncate max-w-[200px] md:max-w-none">
-               {isStarted ? (selectedScenario?.title || "隨機挑戰中") : "探索練習情境"}
-             </h2>
-          </div>
-          <div className="flex items-center gap-3">
-             {isStarted && (
-               <div className="hidden md:flex items-center gap-2 mr-4 text-[11px] font-bold text-[#706C61] uppercase tracking-wider">
-                 <div className={`w-2 h-2 rounded-full ${isPaused ? "bg-muted-foreground" : "bg-secondary animate-pulse"}`} />
-                 <span>Session Timer: 05:24</span>
-               </div>
-             )}
-             <button
-               onClick={() => setHelpOpen(true)}
-               className="w-10 h-10 border border-[#E5E2D9] flex items-center justify-center rounded-lg hover:bg-[#FAF9F6] transition-all group"
-             >
-               <HelpCircle className="w-5 h-5 text-[#A09C94] group-hover:text-primary transition-colors" />
-             </button>
-          </div>
-        </header>
+  // Sidebar content for chatroom
+  const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <div className="flex flex-col h-full w-[260px] bg-[#1E1D1B] text-[#FAF9F6] py-8 px-6">
+      {/* Brand */}
+      <div className="flex items-center gap-2.5 mb-8">
+        <div className="w-7 h-7 bg-primary rounded-sm shrink-0" />
+        <span className="font-heading text-base font-bold tracking-wider">SELf-corner</span>
+      </div>
 
-        {/* Content View Area */}
-        <div className="flex-1 relative overflow-hidden">
-          {/* PAUSE OVERLAY */}
+      {/* Session info (only when started) */}
+      {isStarted && (
+        <div className="bg-[#2A2927] p-4 flex flex-col gap-2 mb-6">
+          <span className="font-heading text-[10px] font-semibold tracking-widest text-primary">
+            CURRENT SESSION
+          </span>
+          <span className="text-sm font-semibold">
+            {selectedScenario?.title || "隨機情境挑戰"}
+          </span>
+          <span className="font-heading text-xl font-bold">{formatTime(elapsedSeconds)}</span>
+        </div>
+      )}
+
+      {/* Nav items */}
+      <nav className="flex flex-col gap-1">
+        <button
+          className="flex items-center gap-3.5 px-3 py-2 text-[13px] font-heading font-medium bg-[#E07A5F15] text-primary border-l-4 border-primary -ml-px rounded-sm"
+        >
+          <MessageCircle className="w-5 h-5" />
+          對話
+        </button>
+        <button
+          className="flex items-center gap-3.5 px-3 py-2 text-[13px] font-heading font-medium text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5 rounded-sm"
+        >
+          <Radar className="w-5 h-5" />
+          即時分析
+        </button>
+      </nav>
+
+      <div className="flex-1" />
+
+      {/* Bottom actions */}
+      <div className="flex flex-col gap-3">
+        {isStarted && (
+          <>
+            <button
+              onClick={() => { handleTogglePause(); onNavigate?.(); }}
+              className="flex items-center gap-2 text-[13px] font-heading font-medium text-[#A09C94] hover:text-[#FAF9F6] transition-colors"
+            >
+              {isPaused ? <CirclePlay className="w-5 h-5" /> : <CirclePause className="w-5 h-5" />}
+              {isPaused ? "繼續練習" : "暫停練習"}
+            </button>
+            <button
+              onClick={() => { handleEnd(); onNavigate?.(); }}
+              className="flex items-center gap-2 text-[13px] font-heading font-medium text-[#B54A4A] hover:text-red-400 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              結束對話
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Desktop sidebar */}
+      <aside className="hidden md:block shrink-0">
+        <SidebarContent />
+      </aside>
+
+      {/* Mobile hamburger */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <div className="md:hidden fixed top-0 left-0 z-40 p-3">
+          <SheetTrigger asChild>
+            <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#1E1D1B] text-white shadow-md">
+              <Menu className="w-5 h-5" />
+            </button>
+          </SheetTrigger>
+        </div>
+        <SheetContent side="left" className="p-0 w-[260px] bg-[#1E1D1B] border-none">
+          <SidebarContent onNavigate={() => setMobileOpen(false)} />
+        </SheetContent>
+      </Sheet>
+
+      {/* Main content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Header bar */}
+        <div className="h-14 bg-white border-b border-[#E5E2D9] flex items-center justify-between px-6 shrink-0">
+          <span className="text-sm font-semibold text-foreground pl-12 md:pl-0">
+            {isStarted
+              ? `情境：${selectedScenario?.title || "隨機情境挑戰"}`
+              : "選擇練習情境"}
+          </span>
+          <div className="flex items-center gap-3">
+            {isStarted && (
+              <div className="flex items-center gap-1.5">
+                <div className={`w-2 h-2 rounded-full ${isPaused ? "bg-muted-foreground" : "bg-secondary animate-pulse"}`} />
+                <span className="text-xs text-muted-foreground">
+                  {isPaused ? "已暫停" : "學生思考中..."}
+                </span>
+              </div>
+            )}
+            <button
+              onClick={() => setHelpOpen(true)}
+              className="w-9 h-9 border border-[#E5E2D9] flex items-center justify-center rounded-sm hover:bg-muted/30 transition-colors"
+            >
+              <HelpCircle className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content area */}
+        <div className="flex-1 relative overflow-hidden bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${classroomBg})` }}>
+          {/* Paused overlay */}
           {isStarted && isPaused && (
-            <div className="absolute inset-0 z-40 bg-background/30 backdrop-blur(8px) flex items-center justify-center animate-in fade-in duration-300">
-              <div className="bg-white border border-[#E5E2D9] p-10 rounded-2xl shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center">
-                <div className="w-16 h-16 bg-[#FAF9F6] rounded-full flex items-center justify-center">
-                   <AlertCircle className="w-8 h-8 text-[#A09C94]" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-heading text-2xl font-bold text-[#3D3831]">對話已暫停</h3>
-                  <p className="text-sm text-[#706C61] font-medium leading-relaxed">
-                    深呼吸，整理一下思緒吧！準備好後點擊下方按鈕繼續練習。
-                  </p>
-                </div>
-                <button 
-                  onClick={handleTogglePause}
-                  className="w-full h-12 bg-primary text-white font-heading font-bold rounded-lg shadow-lg hover:bg-[#C8694F] transition-all flex items-center justify-center gap-2"
-                >
-                  <Play className="w-4 h-4 fill-current" />
-                  繼續練習
-                </button>
+            <div className="absolute inset-0 flex items-center justify-center z-10 bg-background/40 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-4 bg-white p-6 border border-[#E5E2D9] shadow-lg">
+                <AlertCircle className="h-12 w-12 text-muted-foreground" />
+                <span className="font-heading text-xl font-bold text-foreground">對話已暫停</span>
+                <p className="text-sm text-muted-foreground">深呼吸，整理一下思緒吧！</p>
               </div>
             </div>
           )}
 
-          {/* 1. SCENARIO SELECTION VIEW */}
+          {/* Scenario selection */}
           {!isStarted && !selectedScenario && !showRandomConfirm && (
-            <div className="h-full overflow-y-auto px-6 py-10 md:px-12 animate-in fade-in duration-500">
-               <div className="max-w-5xl mx-auto flex flex-col gap-10">
-                 {/* Title & Filter Bar */}
-                 <div className="flex flex-col gap-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col gap-1">
-                        <span className="font-heading text-[10px] font-bold tracking-[0.2em] text-primary uppercase">Scenario Pool</span>
-                        <h3 className="font-heading text-2xl font-bold text-[#3D3831]">選擇一個練習情境</h3>
-                      </div>
-                      <button 
-                        onClick={handleRefresh}
-                        className="flex items-center gap-2 px-4 py-2 border border-[#E5E2D9] rounded-lg text-sm font-bold text-[#706C61] hover:bg-white hover:text-primary transition-all group shadow-sm"
-                      >
-                        <RotateCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-                        換一批
-                      </button>
-                    </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-md p-8 overflow-y-auto">
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="font-heading text-2xl font-bold text-foreground">選擇練習情境</h2>
+                <button
+                  onClick={handleRefresh}
+                  className="w-9 h-9 flex items-center justify-center rounded-sm text-muted-foreground hover:text-primary transition-colors"
+                  title="換一批情境"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-muted-foreground mb-8">選擇一個你曾在課堂上遇到，或感到棘手的學生情緒事件。</p>
 
-                    {/* Filter Tags */}
-                    <div className="flex flex-wrap gap-2">
-                      {TAGS.map(tag => (
-                        <button
-                          key={tag}
-                          onClick={() => setActiveTag(tag)}
-                          className={`px-4 py-1.5 rounded-full text-[12px] font-bold tracking-wide transition-all ${
-                            activeTag === tag 
-                            ? "bg-[#3D3831] text-white shadow-md" 
-                            : "bg-white border border-[#E5E2D9] text-[#706C61] hover:border-[#3D3831]"
-                          }`}
-                        >
-                          {tag}
-                        </button>
-                      ))}
-                    </div>
-                 </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl w-full mb-6">
+                {displayedScenarios.map((scenario) => (
+                  <ScenarioCard key={scenario.id} scenario={scenario} onClick={handleCardClick} />
+                ))}
+              </div>
 
-                 {/* Scenario Grid */}
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {displayedScenarios.map((scenario) => (
-                      <ScenarioCard key={scenario.id} scenario={scenario} onClick={handleCardClick} />
-                    ))}
-                    {/* Random Challenge Card */}
-                    <button
-                      onClick={handleRandomClick}
-                      className="group flex flex-col items-center justify-center gap-4 p-8 border-2 border-dashed border-primary/30 rounded-2xl bg-white hover:border-primary hover:bg-primary/5 hover:shadow-xl transition-all duration-300"
-                    >
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Dices className="w-8 h-8 text-primary" />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-heading text-lg font-bold text-[#3D3831]">隨機挑戰挑戰</span>
-                        <p className="text-xs text-[#706C61] font-medium leading-relaxed">
-                          由系統隨機挑選一個<br/>未知情境進行練習
-                        </p>
-                      </div>
-                    </button>
-                 </div>
-               </div>
+              <Card
+                onClick={handleRandomClick}
+                className="cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg border-2 border-dashed border-primary/40 bg-white hover:border-primary hover:bg-primary/5 max-w-4xl w-full mt-2"
+              >
+                <CardContent className="p-6 text-center flex flex-col items-center justify-center gap-3">
+                  <div className="p-3 bg-primary/10 rounded-full">
+                    <Dices className="h-8 w-8 text-primary" />
+                  </div>
+                  <p className="font-heading font-bold text-lg text-foreground">隨機情境挑戰</p>
+                  <p className="text-sm text-muted-foreground">不知道從何開始？讓系統為你挑選一個挑戰吧！</p>
+                </CardContent>
+              </Card>
             </div>
           )}
 
-          {/* 2. DETAIL / CONFIRM VIEWS */}
+          {/* Scenario detail */}
           {!isStarted && selectedScenario && (
             <ScenarioDetail scenario={selectedScenario} onClose={handleCloseDetail} onStart={handleStart} />
           )}
+
+          {/* Random confirm */}
           {!isStarted && showRandomConfirm && (
             <RandomConfirm onClose={handleCloseDetail} onStart={handleStart} />
           )}
 
-          {/* 3. ACTIVE SESSION VIEW */}
+          {/* Active session */}
           {isStarted && (
-            <div className="h-full flex flex-col animate-in fade-in zoom-in-95 duration-500">
-               {/* Center student visualization */}
-               <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-48">
-                  <div className="relative group">
-                     <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl animate-pulse" />
-                     <div className="w-[140px] h-[140px] rounded-full bg-[#F0EDE6] border-4 border-white shadow-xl flex items-center justify-center text-6xl relative z-10 transition-transform hover:scale-105 duration-500">
-                        {renderStudentAvatar()}
-                     </div>
+            <div className="absolute inset-0 flex flex-col">
+              {/* Student info bar - top strip */}
+              <div className="flex items-center gap-3 px-6 py-3 bg-black/30 backdrop-blur-md z-10">
+                <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-xl shadow-sm">
+                  {renderStudentAvatar()}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-white drop-shadow-sm">小明（國二）</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    <span className="text-[11px] font-medium text-white/80">
+                      {emotionLabel()}
+                    </span>
                   </div>
-                  <div className="flex flex-col items-center gap-3 relative z-10">
-                     <h3 className="font-heading text-lg font-bold text-[#3D3831]">
-                        {selectedScenarioId === 1 ? "林小明 (國二)" : "匿名學生"}
-                     </h3>
-                     <div className="flex items-center gap-2 bg-[#E07A5F15] px-4 py-1.5 rounded-full border border-primary/20">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                        <span className="font-heading text-[11px] font-bold tracking-widest text-primary uppercase">
-                           {emotionLabel()}
-                        </span>
-                     </div>
-                  </div>
-               </div>
+                </div>
+              </div>
 
-               {/* Bottom Chat Panel - Fixed or docked */}
-               <ChatPanel
-                 isPaused={isPaused}
-                 onTogglePause={handleTogglePause}
-                 onEnd={handleEnd}
-                 onEmotionChange={(emo) => setStudentEmotion(emo as any)}
-               />
+              {/* Spacer - classroom background visible */}
+              <div className="flex-1" />
+
+              {/* Chat Panel - bottom portion */}
+              <ChatPanel
+                isPaused={isPaused}
+                onTogglePause={handleTogglePause}
+                onEnd={handleEnd}
+                onEmotionChange={(emo) => setStudentEmotion(emo as any)}
+              />
             </div>
           )}
         </div>
-      </div>
+      </main>
 
       {/* Help Dialog */}
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
-        <DialogContent className="sm:max-w-md border-none p-0 overflow-hidden rounded-2xl shadow-2xl">
-          <div className="bg-[#3D3831] p-6 text-white flex items-center gap-3">
-             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-                <HelpCircle className="w-6 h-6 text-white" />
-             </div>
-             <div>
-                <h2 className="font-heading text-xl font-bold">對話練習指南</h2>
-                <p className="text-xs text-white/60 font-medium">Safe Harbor & Consistent Communication</p>
-             </div>
-          </div>
-          <div className="p-8 space-y-6">
-            <div className="space-y-4">
-               {[
-                 { id: 1, text: "選擇情境：從情境池中挑選一個感興趣或想精進的對話挑戰。" },
-                 { id: 2, text: "模擬互動：使用語音或文字，像平常對話一樣與 AI 學生互動。" },
-                 { id: 3, text: "覺察情緒：觀察學生的表情與情緒標籤，調整您的溝通姿態。" },
-                 { id: 4, text: "暫停反思：若感到壓力或不知如何回應，隨時按暫停深呼吸。" },
-                 { id: 5, text: "專家回饋：結束後查看雷達圖指標，學習「一致性」的表達方式。" }
-               ].map(item => (
-                 <div key={item.id} className="flex gap-4 group">
-                    <span className="w-6 h-6 shrink-0 bg-[#FAF9F6] border border-[#E5E2D9] rounded-full flex items-center justify-center text-[10px] font-bold text-[#706C61] group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
-                      {item.id}
-                    </span>
-                    <p className="text-sm text-[#706C61] font-medium leading-relaxed">{item.text}</p>
-                 </div>
-               ))}
-            </div>
-            <button 
-              onClick={() => setHelpOpen(false)}
-              className="w-full h-12 border-2 border-[#3D3831] text-[#3D3831] font-heading font-bold rounded-lg hover:bg-[#3D3831] hover:text-white transition-all uppercase tracking-widest text-xs"
-            >
-              我知道了
-            </button>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading">對話空間使用說明</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground">
+            <p>歡迎來到安全的練習角落！這裡是你與虛擬學生互動的沙盒：</p>
+            <ul className="space-y-3">
+              <li className="flex gap-2"><span className="text-primary font-bold">1.</span> 選擇一個情境卡片，或點擊隨機挑戰。</li>
+              <li className="flex gap-2"><span className="text-primary font-bold">2.</span> 對話開始後，你可以點擊麥克風講話，或輸入文字。</li>
+              <li className="flex gap-2"><span className="text-primary font-bold">3.</span> 觀察學生的表情變化，試著用同理心回應。</li>
+              <li className="flex gap-2"><span className="text-primary font-bold">4.</span> 隨時可以按「暫停」休息，準備好再繼續。</li>
+              <li className="flex gap-2"><span className="text-primary font-bold">5.</span> 結束後，系統會提供 Satir 與 SEL 的專家回饋。</li>
+            </ul>
           </div>
         </DialogContent>
       </Dialog>
-    </AppLayout>
+    </div>
   );
 }
