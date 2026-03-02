@@ -7,6 +7,8 @@ import {
   User,
   LogOut,
   ChevronRight,
+  Pause,
+  LogOutIcon,
 } from "lucide-react";
 
 const navItems = [
@@ -17,11 +19,24 @@ const navItems = [
   { label: "個人帳號", icon: User, path: "/info" },
 ];
 
+// Session nav items shown during active practice
+const sessionNavItems = [
+  { label: "對話", icon: MessageCircle, id: "chat" },
+  { label: "即時分析", icon: Radar, id: "analysis" },
+];
+
 interface SidebarProps {
   onNavigate?: () => void;
+  sessionInfo?: {
+    scenarioTitle: string;
+    formattedTime: string;
+    isPaused: boolean;
+    onTogglePause: () => void;
+    onEnd: () => void;
+  };
 }
 
-export default function Sidebar({ onNavigate }: SidebarProps) {
+export default function Sidebar({ onNavigate, sessionInfo }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,51 +65,116 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         </span>
       </div>
 
-      {/* Menu Label */}
-      <div className="px-6 mb-4">
-        <span className="font-heading text-[10px] font-bold tracking-[0.2em] text-[#706C61]">
-          MAIN NAVIGATION
-        </span>
-      </div>
+      {/* Session Info - shown during active practice */}
+      {sessionInfo && (
+        <div className="px-6 mb-8">
+          <span className="font-heading text-[10px] font-bold tracking-[0.2em] text-primary uppercase">
+            CURRENT SESSION
+          </span>
+          <h3 className="font-heading text-sm font-bold text-[#FAF9F6] mt-2 leading-snug">
+            {sessionInfo.scenarioTitle}
+          </h3>
+          <span className="font-heading text-3xl font-bold text-[#FAF9F6] mt-3 block tabular-nums tracking-wider">
+            {sessionInfo.formattedTime}
+          </span>
+        </div>
+      )}
 
-      {/* Nav items */}
-      <nav className="flex flex-col gap-1.5 px-3">
-        {navItems.map((item) => {
-          const active = isActive(item.path);
-          return (
-            <button
-              key={item.path}
-              onClick={() => handleNav(item.path)}
-              className={`flex items-center gap-3 px-4 py-3 text-[13px] font-heading font-semibold transition-all rounded-sm group relative ${
-                active
-                  ? "bg-primary/15 text-primary"
-                  : "text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5"
-              }`}
-            >
-              {active && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
-              )}
-              <item.icon className={`w-5 h-5 shrink-0 transition-colors ${active ? "text-primary" : "group-hover:text-[#FAF9F6]"}`} />
-              <span className="flex-1 text-left">{item.label}</span>
-              {active && <ChevronRight className="w-4 h-4 text-primary/50" />}
-            </button>
-          );
-        })}
-      </nav>
+      {/* Nav section */}
+      {sessionInfo ? (
+        <>
+          <div className="px-6 mb-4">
+            <span className="font-heading text-[10px] font-bold tracking-[0.2em] text-[#706C61]">
+              SESSION
+            </span>
+          </div>
+          <nav className="flex flex-col gap-1.5 px-3">
+            {sessionNavItems.map((item) => {
+              const active = item.id === "chat";
+              return (
+                <button
+                  key={item.id}
+                  className={`flex items-center gap-3 px-4 py-3 text-[13px] font-heading font-semibold transition-all rounded-sm group relative ${
+                    active
+                      ? "bg-primary/15 text-primary"
+                      : "text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5"
+                  }`}
+                >
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+                  )}
+                  <item.icon className={`w-5 h-5 shrink-0 transition-colors ${active ? "text-primary" : "group-hover:text-[#FAF9F6]"}`} />
+                  <span className="flex-1 text-left">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </>
+      ) : (
+        <>
+          <div className="px-6 mb-4">
+            <span className="font-heading text-[10px] font-bold tracking-[0.2em] text-[#706C61]">
+              MAIN NAVIGATION
+            </span>
+          </div>
+          <nav className="flex flex-col gap-1.5 px-3">
+            {navItems.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNav(item.path)}
+                  className={`flex items-center gap-3 px-4 py-3 text-[13px] font-heading font-semibold transition-all rounded-sm group relative ${
+                    active
+                      ? "bg-primary/15 text-primary"
+                      : "text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5"
+                  }`}
+                >
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
+                  )}
+                  <item.icon className={`w-5 h-5 shrink-0 transition-colors ${active ? "text-primary" : "group-hover:text-[#FAF9F6]"}`} />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {active && <ChevronRight className="w-4 h-4 text-primary/50" />}
+                </button>
+              );
+            })}
+          </nav>
+        </>
+      )}
 
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Logout */}
-      <div className="px-3 mb-6">
-        <button
-          onClick={() => handleNav("/login")}
-          className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-heading font-semibold text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5 transition-all rounded-sm group"
-        >
-          <LogOut className="w-5 h-5 shrink-0 group-hover:text-destructive transition-colors" />
-          <span>登出系統</span>
-        </button>
-      </div>
+      {/* Session controls or Logout */}
+      {sessionInfo ? (
+        <div className="px-3 mb-6 flex flex-col gap-1.5">
+          <button
+            onClick={sessionInfo.onTogglePause}
+            className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-heading font-semibold text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5 transition-all rounded-sm group"
+          >
+            <Pause className="w-5 h-5 shrink-0 group-hover:text-[#FAF9F6] transition-colors" />
+            <span>{sessionInfo.isPaused ? "繼續練習" : "暫停練習"}</span>
+          </button>
+          <button
+            onClick={sessionInfo.onEnd}
+            className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-heading font-semibold text-primary hover:text-primary hover:bg-primary/10 transition-all rounded-sm group"
+          >
+            <LogOutIcon className="w-5 h-5 shrink-0 text-primary transition-colors" />
+            <span>結束對話</span>
+          </button>
+        </div>
+      ) : (
+        <div className="px-3 mb-6">
+          <button
+            onClick={() => handleNav("/login")}
+            className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-heading font-semibold text-[#A09C94] hover:text-[#FAF9F6] hover:bg-white/5 transition-all rounded-sm group"
+          >
+            <LogOut className="w-5 h-5 shrink-0 group-hover:text-destructive transition-colors" />
+            <span>登出系統</span>
+          </button>
+        </div>
+      )}
 
       {/* User profile info */}
       <div className="px-6 pt-6 border-t border-white/5">
