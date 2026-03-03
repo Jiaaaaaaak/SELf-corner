@@ -99,12 +99,14 @@ export default function Chatroom() {
     setVoicePromptOpen(true);
   };
 
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+
   const handleVoiceConfirm = (enableVoice: boolean) => {
     setVoicePromptOpen(false);
+    setVoiceEnabled(enableVoice);
     setIsStarted(true);
     setIsPaused(false);
     setElapsedSeconds(0);
-    // TODO: pass enableVoice to ChatPanel when voice is implemented
   };
 
   const handleCloseDetail = () => {
@@ -319,6 +321,7 @@ export default function Chatroom() {
               onTogglePause={handleTogglePause}
               onEnd={handleEnd}
               onEmotionChange={(emo) => setStudentEmotion(emo as any)}
+              voiceEnabled={voiceEnabled}
             />
           )}
         </div>
