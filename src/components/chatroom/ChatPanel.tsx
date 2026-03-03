@@ -11,14 +11,15 @@ interface ChatPanelProps {
   onTogglePause: () => void;
   onEnd: () => void;
   onEmotionChange?: (emotion: string) => void;
+  voiceEnabled?: boolean;
 }
 
-export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionChange }: ChatPanelProps) {
+export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionChange, voiceEnabled = false }: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: "student", content: "老師......我有點不想說，但我今天心情真的很差。" },
   ]);
   const [inputText, setInputText] = useState("");
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(voiceEnabled);
   const [isThinking, setIsThinking] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
