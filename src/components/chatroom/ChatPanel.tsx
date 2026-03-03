@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Mic, Send, Pause, Play, SquareSquare, Disc2, Loader2 } from "lucide-react";
+import { Mic, MicOff, Send, Pause, Play, SquareSquare, Loader2, ClipboardCheck } from "lucide-react";
 
 interface ChatMessage {
   role: "teacher" | "student";
@@ -128,13 +128,22 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
             <button
               onClick={toggleRecording}
               disabled={isPaused}
-              className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg transition-all active:scale-95 ${
+              className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg transition-all active:scale-95 relative ${
                 isRecording
-                  ? "bg-destructive text-white ring-4 ring-destructive/20 animate-pulse"
-                  : "bg-primary text-white hover:bg-primary/90 hover:scale-105"
+                  ? "bg-destructive text-white"
+                  : "bg-[#3D3831]/60 backdrop-blur-sm text-white/70 hover:bg-[#3D3831]/80 hover:text-white hover:scale-105"
               } disabled:opacity-50`}
             >
-              {isRecording ? <Disc2 className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              {isRecording ? (
+                <>
+                  {/* Recording pulse rings */}
+                  <span className="absolute inset-0 rounded-full bg-destructive/40 animate-ping" />
+                  <span className="absolute inset-[-4px] rounded-full border-2 border-destructive/30 animate-pulse" />
+                  <Mic className="w-5 h-5 relative z-10" />
+                </>
+              ) : (
+                <MicOff className="w-5 h-5" />
+              )}
             </button>
 
             {/* Send button */}
@@ -155,13 +164,14 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
               {isPaused ? <Play className="w-5 h-5 fill-current" /> : <Pause className="w-5 h-5" />}
             </button>
 
-            {/* End button */}
+            {/* End & Analyze button */}
             <button
               onClick={onEnd}
-              className="w-12 h-12 rounded-full flex items-center justify-center bg-white/80 backdrop-blur-sm border border-white/50 text-[#706C61] hover:text-destructive transition-all shadow-lg hover:scale-105 active:scale-95"
-              title="結束對話"
+              className="h-12 px-5 rounded-full flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm border border-white/50 text-[#706C61] hover:text-primary hover:border-primary/30 transition-all shadow-lg hover:scale-105 active:scale-95"
+              title="結束對話並分析"
             >
-              <SquareSquare className="w-5 h-5" />
+              <ClipboardCheck className="w-5 h-5" />
+              <span className="text-xs font-bold">結束並分析</span>
             </button>
           </div>
         </div>

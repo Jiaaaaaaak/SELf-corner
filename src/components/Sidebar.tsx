@@ -8,7 +8,7 @@ import {
   LogOut,
   ChevronRight,
   Pause,
-  LogOutIcon,
+  ClipboardCheck,
 } from "lucide-react";
 
 const navItems = [
@@ -158,8 +158,8 @@ export default function Sidebar({ onNavigate, sessionInfo }: SidebarProps) {
             onClick={sessionInfo.onEnd}
             className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-heading font-semibold text-primary hover:text-primary hover:bg-primary/10 transition-all rounded-sm group"
           >
-            <LogOutIcon className="w-5 h-5 shrink-0 text-primary transition-colors" />
-            <span>結束對話</span>
+            <ClipboardCheck className="w-5 h-5 shrink-0 text-primary transition-colors" />
+            <span>結束對話並分析</span>
           </button>
         </div>
       ) : (
