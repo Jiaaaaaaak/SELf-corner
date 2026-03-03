@@ -64,7 +64,7 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
       {/* Chat messages - scrollable, limited to 25vh */}
       <div className="px-8 py-2">
         <div className="max-w-4xl mx-auto">
-          <div className="max-h-[25vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent pr-1">
+          <div className="max-h-[18vh] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-white/60">
             <div className="flex flex-col gap-2">
               {messages.map((msg, i) => (
                 <div 
