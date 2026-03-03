@@ -57,56 +57,59 @@ export default function ChatPanel({ isPaused, onTogglePause, onEnd, onEmotionCha
     if (!isRecording && onEmotionChange) onEmotionChange("neutral");
   };
 
-  // Only show recent messages to preserve screen space
-  const visibleMessages = messages.slice(-3);
+  // Show all messages, scrollable
 
   return (
     <div className="absolute bottom-0 left-0 right-0 flex flex-col z-30">
-      {/* Chat messages - transparent, minimal, only recent */}
-      <div className="px-8 py-3">
-        <div className="max-w-2xl mx-auto flex flex-col gap-3">
-          {visibleMessages.map((msg, i) => (
-            <div 
-              key={messages.length - visibleMessages.length + i} 
-              className={`flex ${msg.role === "teacher" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
-            >
-              {msg.role === "student" && (
-                <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm border border-[#E5E2D9]/50 flex items-center justify-center shrink-0 mr-2.5 self-end shadow-sm">
-                  <span className="text-[10px] font-bold text-[#706C61]">小</span>
+      {/* Chat messages - scrollable, limited to 25vh */}
+      <div className="px-8 py-2">
+        <div className="max-w-4xl mx-auto">
+          <div className="max-h-[25vh] overflow-y-auto scrollbar-thin scrollbar-thumb-white/30 scrollbar-track-transparent pr-1">
+            <div className="flex flex-col gap-2">
+              {messages.map((msg, i) => (
+                <div 
+                  key={i} 
+                  className={`flex ${msg.role === "teacher" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                >
+                  {msg.role === "student" && (
+                    <div className="w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm border border-[#E5E2D9]/50 flex items-center justify-center shrink-0 mr-2 self-end shadow-sm">
+                      <span className="text-[10px] font-bold text-[#706C61]">小</span>
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[65%] px-3 py-1.5 text-[14px] font-medium leading-relaxed shadow-md ${
+                      msg.role === "teacher"
+                        ? "bg-primary/70 backdrop-blur-sm text-white rounded-[16px] rounded-tr-sm"
+                        : "bg-white/60 backdrop-blur-sm text-[#3D3831] rounded-[16px] rounded-tl-sm border border-white/30"
+                    }`}
+                  >
+                    <p>{msg.content}</p>
+                  </div>
+                </div>
+              ))}
+              {isThinking && (
+                <div className="flex justify-start animate-in fade-in duration-300">
+                  <div className="w-7 h-7 rounded-full bg-white/80 backdrop-blur-sm border border-[#E5E2D9]/50 flex items-center justify-center shrink-0 mr-2 self-end shadow-sm">
+                    <Loader2 className="w-3.5 h-3.5 text-[#706C61] animate-spin" />
+                  </div>
+                  <div className="bg-white/80 backdrop-blur-sm border border-white/50 px-4 py-2 rounded-[16px] rounded-tl-sm shadow-md">
+                    <div className="flex gap-1.5">
+                      <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce" />
+                    </div>
+                  </div>
                 </div>
               )}
-              <div
-                className={`max-w-[65%] px-4 py-2.5 text-[14px] font-medium leading-relaxed shadow-md ${
-                  msg.role === "teacher"
-                    ? "bg-primary/70 backdrop-blur-sm text-white rounded-[16px] rounded-tr-sm"
-                    : "bg-white/60 backdrop-blur-sm text-[#3D3831] rounded-[16px] rounded-tl-sm border border-white/30"
-                }`}
-              >
-                <p>{msg.content}</p>
-              </div>
+              <div ref={bottomRef} />
             </div>
-          ))}
-          {isThinking && (
-            <div className="flex justify-start animate-in fade-in duration-300">
-              <div className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm border border-[#E5E2D9]/50 flex items-center justify-center shrink-0 mr-2.5 self-end shadow-sm">
-                <Loader2 className="w-3.5 h-3.5 text-[#706C61] animate-spin" />
-              </div>
-              <div className="bg-white/80 backdrop-blur-sm border border-white/50 px-5 py-3 rounded-[18px] rounded-tl-sm shadow-lg">
-                <div className="flex gap-1.5">
-                  <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                  <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                  <div className="w-2 h-2 bg-[#A09C94] rounded-full animate-bounce" />
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={bottomRef} />
+          </div>
         </div>
       </div>
 
       {/* Input bar */}
       <div className="px-8 py-4">
-        <div className="max-w-2xl mx-auto flex items-center gap-3">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
           {/* Text input - takes most space */}
           <div className="flex-1 flex items-center h-11 px-4 bg-white/50 backdrop-blur-md border border-white/30 rounded-full shadow-md focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/30 transition-all">
             <input
