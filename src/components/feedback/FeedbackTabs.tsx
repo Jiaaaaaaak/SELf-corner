@@ -120,7 +120,7 @@ export default function FeedbackTabs({ transcript, userInput, onUserInputChange,
 
           {/* Transcript Tab */}
           <TabsContent value="transcript" className="flex-1 m-0">
-            <ScrollArea className="h-full px-8 py-8">
+            <ScrollArea className="h-[480px] px-8 py-8">
               <div className="space-y-6">
                 {transcript.map((entry, index) => (
                   <div
